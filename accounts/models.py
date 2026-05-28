@@ -40,3 +40,5 @@ class User(AbstractUser):
     def __str__(self):
         return self.phone_number
 
+
+    # Custom user model using phone number instead of username
