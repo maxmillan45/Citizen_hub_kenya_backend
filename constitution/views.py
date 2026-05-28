@@ -35,3 +35,5 @@ class ArticleDetailView(APIView):
         except Article.DoesNotExist:
             return Response({'error': 'Article not found'}, status=status.HTTP_404_NOT_FOUND)
 
+
+# Search functionality uses case-insensitive matching across all text fields
