@@ -105,3 +105,4 @@ SIMPLE_JWT = {
 
 # Citizen Hub Kenya - Backend Configuration
 # All timestamps stored in Africa/Nairobi timezone
+# Access token expires in 60 minutes, refresh token in 1 day
