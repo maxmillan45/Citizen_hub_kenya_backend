@@ -7,3 +7,5 @@ urlpatterns = [
     path('api/constitution/', include('constitution.urls')),
 ]
 
+
+# API endpoints: /api/auth/ (register, login, profile) and /api/constitution/ (search, article)
