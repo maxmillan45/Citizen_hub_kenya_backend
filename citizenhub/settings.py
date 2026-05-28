@@ -104,3 +104,4 @@ SIMPLE_JWT = {
 }
 
 # Citizen Hub Kenya - Backend Configuration
+# All timestamps stored in Africa/Nairobi timezone
