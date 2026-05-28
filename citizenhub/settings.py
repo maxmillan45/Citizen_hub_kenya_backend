@@ -103,3 +103,4 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
+# Citizen Hub Kenya - Backend Configuration
