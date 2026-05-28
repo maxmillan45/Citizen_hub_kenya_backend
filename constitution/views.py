@@ -37,3 +37,5 @@ class ArticleDetailView(APIView):
 
 
 # Search functionality uses case-insensitive matching across all text fields
+
+    # Search across full_text, simplified_english, and simplified_swahili fields
