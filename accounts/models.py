@@ -42,3 +42,5 @@ class User(AbstractUser):
 
 
     # Custom user model using phone number instead of username
+
+    # Custom manager to handle user creation without username field
