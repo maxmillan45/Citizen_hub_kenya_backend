@@ -20,3 +20,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+# Python 3.14+ required for this project
