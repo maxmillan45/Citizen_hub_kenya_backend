@@ -44,3 +44,5 @@ class ProfileView(APIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
+
+    # Register new user with phone number only (no password required initially)
