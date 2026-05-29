@@ -6,3 +6,4 @@ urlpatterns = [
     path('history/', ConversationHistoryView.as_view(), name='chatbot-history'),
     path('rate/', RateAnswerView.as_view(), name='chatbot-rate'),
 ]
+# Chatbot URL patterns: ask, history, and rate endpoints
