@@ -5,7 +5,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('accounts.urls')),
     path('api/constitution/', include('constitution.urls')),
+    path('api/chatbot/', include('chatbot.urls')),
 ]
-
-
-# API endpoints: /api/auth/ (register, login, profile) and /api/constitution/ (search, article)
