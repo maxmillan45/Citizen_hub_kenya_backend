@@ -85,3 +85,4 @@ class RateAnswerView(APIView):
             return Response({'message': 'Thank you for your feedback'})
         except Conversation.DoesNotExist:
             return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+# Chatbot views handle question answering, conversation history, and user ratings
