@@ -18,14 +18,19 @@ class AskChatbotView(APIView):
             return Response({'error': 'Question is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Search for relevant articles in the database
-        articles = Article.objects.filter(
-            Q(full_text__icontains=question) |
-            Q(simplified_english__icontains=question) |
-            Q(title__icontains=question) |
-            Q(article_number__icontains=question)
-        )[:5]
+        search_keywords = question.lower().split()
         
-        # Build response from found articles
+        # Build query to search for keywords
+        query = Q()
+        for keyword in search_keywords:
+            if len(keyword) > 3:  # Only use keywords longer than 3 characters
+                query |= Q(full_text__icontains=keyword)
+                query |= Q(simplified_english__icontains=keyword)
+                query |= Q(simplified_swahili__icontains=keyword)
+                query |= Q(title__icontains=keyword)
+        
+        articles = Article.objects.filter(query).distinct()[:5]
+        
         sources = []
         context = ""
         
@@ -37,14 +42,29 @@ class AskChatbotView(APIView):
         if sources:
             answer = f"Based on the Constitution of Kenya:\n\n{context}\n\nThis information is for educational purposes. Consult a lawyer for legal advice."
         else:
-            # Fallback answers for common questions without exact matches
+            # Fallback answers for common questions
             q_lower = question.lower()
-            if "arrest" in q_lower or "police" in q_lower:
+            if "arrest" in q_lower or "police" in q_lower or "criminal" in q_lower:
                 answer = "Under Article 49 of the Kenyan Constitution, if you are arrested you have the right to: be informed why you are arrested, remain silent, call a lawyer, and be brought to court within 24 hours."
-            elif "privacy" in q_lower or "phone" in q_lower:
+                sources = ["49"]
+            elif "privacy" in q_lower or "phone" in q_lower or "search" in q_lower:
                 answer = "Under Article 31 of the Kenyan Constitution, you have the right to privacy. Police generally need a warrant to search your phone or home."
-            elif "property" in q_lower or "land" in q_lower:
-                answer = "Under Article 40 of the Kenyan Constitution, you have the right to own property. The government can only take your land for public use with fair compensation."
+                sources = ["31"]
+            elif "property" in q_lower or "land" in q_lower or "house" in q_lower:
+                answer = "Under Article 40 of the Kenyan Constitution, you have the right to own property. The government can only take your land for public use and must pay you fair compensation."
+                sources = ["40"]
+            elif "health" in q_lower or "hospital" in q_lower or "medical" in q_lower:
+                answer = "Under Article 43 of the Kenyan Constitution, you have the right to the highest attainable standard of health, including healthcare services."
+                sources = ["43"]
+            elif "education" in q_lower or "school" in q_lower:
+                answer = "Under Article 43 of the Kenyan Constitution, you have the right to education."
+                sources = ["43"]
+            elif "discrimination" in q_lower or "equal" in q_lower:
+                answer = "Under Article 27 of the Kenyan Constitution, every person is equal before the law and has the right to equal protection without discrimination."
+                sources = ["27"]
+            elif "torture" in q_lower or "cruel" in q_lower:
+                answer = "Under Article 29 of the Kenyan Constitution, every person has the right to freedom and security, including freedom from torture and cruel treatment."
+                sources = ["29"]
             else:
                 answer = "I cannot answer this question specifically from the Constitution. Please consult a legal professional for advice on this matter."
         
@@ -85,4 +105,3 @@ class RateAnswerView(APIView):
             return Response({'message': 'Thank you for your feedback'})
         except Conversation.DoesNotExist:
             return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
-# Chatbot views handle question answering, conversation history, and user ratings
