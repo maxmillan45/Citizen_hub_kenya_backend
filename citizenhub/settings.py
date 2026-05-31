@@ -206,3 +206,4 @@ MPESA_PASSKEY = os.getenv('MPESA_PASSKEY', '')
 MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
 # Citizen Hub Kenya - Production Settings
+# All timestamps stored in Africa/Nairobi timezone
