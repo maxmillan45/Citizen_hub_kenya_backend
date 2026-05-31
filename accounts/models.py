@@ -39,3 +39,14 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.phone_number
+
+class MpesaTransaction(models.Model):
+    checkout_request_id = models.CharField(max_length=100, unique=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    result_code = models.IntegerField()
+    result_desc = models.CharField(max_length=200)
+    is_successful = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.checkout_request_id} - {self.result_desc}"
