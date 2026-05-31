@@ -1,0 +1,360 @@
+INFO 2026-05-29 11:26:11,328 autoreload 2320 28952 Watching for file changes with StatReloader
+INFO 2026-05-29 11:26:11,328 autoreload 32560 18716 Watching for file changes with StatReloader
+INFO 2026-05-29 11:28:04,405 autoreload 2320 28952 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:28:04,443 autoreload 32560 18716 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:28:07,869 autoreload 13920 9416 Watching for file changes with StatReloader
+INFO 2026-05-29 11:28:07,909 autoreload 5884 920 Watching for file changes with StatReloader
+INFO 2026-05-29 11:29:08,269 autoreload 13920 9416 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:29:09,550 autoreload 5884 920 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:29:12,527 autoreload 32520 28912 Watching for file changes with StatReloader
+INFO 2026-05-29 11:29:13,508 autoreload 35368 14120 Watching for file changes with StatReloader
+INFO 2026-05-29 11:29:47,752 autoreload 32520 28912 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\urls.py changed, reloading.
+INFO 2026-05-29 11:29:48,986 autoreload 35368 14120 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\urls.py changed, reloading.
+INFO 2026-05-29 11:29:51,640 autoreload 31280 35020 Watching for file changes with StatReloader
+INFO 2026-05-29 11:29:52,618 autoreload 2772 28064 Watching for file changes with StatReloader
+INFO 2026-05-29 11:39:11,310 autoreload 31576 22008 Watching for file changes with StatReloader
+INFO 2026-05-29 11:39:53,743 views 2772 16416 User logged in: 0705632334
+INFO 2026-05-29 11:39:53,759 log 2772 16416 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 11:40:49,059 log 2772 11892 "GET /health/ HTTP/1.1" 200 81
+INFO 2026-05-29 11:41:13,007 views 2772 328 New user registered: 0712345678
+INFO 2026-05-29 11:41:13,008 log 2772 328 "POST /api/auth/register/ HTTP/1.1" 201 70
+INFO 2026-05-29 11:41:30,977 views 2772 34168 User logged in: 0712345678
+INFO 2026-05-29 11:41:30,979 log 2772 34168 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 11:41:44,511 log 2772 20836 "GET /api/constitution/search/?q=rights HTTP/1.1" 200 2198
+INFO 2026-05-29 11:41:54,952 log 2772 3312 "GET /api/constitution/article/49/ HTTP/1.1" 200 606
+INFO 2026-05-29 11:42:11,535 log 2772 25468 "GET /api/chatbot/history/ HTTP/1.1" 200 4380
+INFO 2026-05-29 11:43:51,772 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:07,583 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:19,320 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:33,211 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:35,114 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:38,850 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:39,637 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:39,874 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:41,872 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:43,476 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:43,694 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:57,149 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:44:58,834 log 2772 2188 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+WARNING 2026-05-29 11:45:48,390 log 2772 33424 Bad Request: /api/auth/register/
+WARNING 2026-05-29 11:45:48,391 log 2772 33424 "POST /api/auth/register/ HTTP/1.1" 400 31
+INFO 2026-05-29 11:46:00,253 views 2772 28032 User logged in: 0712345678
+INFO 2026-05-29 11:46:00,257 log 2772 28032 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 11:46:15,558 log 2772 8872 "GET /health/ HTTP/1.1" 200 81
+INFO 2026-05-29 11:47:14,810 views 2772 23476 User logged in: 0799999999
+INFO 2026-05-29 11:47:14,813 log 2772 23476 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 11:48:03,168 log 2772 27184 "POST /api/chatbot/ask/ HTTP/1.1" 200 288
+INFO 2026-05-29 11:48:12,956 log 2772 19896 "GET /api/constitution/search/?q=rights HTTP/1.1" 200 2198
+INFO 2026-05-29 11:48:21,966 log 2772 18264 "GET /api/chatbot/history/ HTTP/1.1" 200 4780
+INFO 2026-05-29 11:48:50,238 log 2772 30796 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 11:48:50,256 views 2772 30796 User logged in: 0705632334
+INFO 2026-05-29 11:48:50,266 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 200 610
+WARNING 2026-05-29 11:49:11,646 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:11,681 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:49:29,418 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:29,420 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:49:30,771 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:30,773 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:49:31,521 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:31,522 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:49:44,408 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:44,409 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:49:45,676 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:49:45,677 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:50:08,003 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:50:08,004 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:50:23,505 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:50:23,506 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:51:12,803 log 2772 34760 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:51:12,804 log 2772 34760 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:51:22,486 log 2772 35988 Unauthorized: /api/chatbot/ask/
+WARNING 2026-05-29 11:51:22,488 log 2772 35988 "POST /api/chatbot/ask/ HTTP/1.1" 401 107
+WARNING 2026-05-29 11:51:53,846 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:51:53,847 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:51:55,780 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:51:55,781 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:51:56,316 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:51:56,317 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:51:56,536 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:51:56,536 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+INFO 2026-05-29 11:52:21,583 log 2772 29468 "GET /health/ HTTP/1.1" 200 81
+INFO 2026-05-29 11:52:32,715 autoreload 23896 23672 Watching for file changes with StatReloader
+INFO 2026-05-29 11:56:03,179 autoreload 34240 5544 Watching for file changes with StatReloader
+WARNING 2026-05-29 11:56:25,109 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:56:25,110 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:56:27,084 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:56:27,085 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:56:41,428 log 2772 30796 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:56:41,429 log 2772 30796 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:57:02,386 log 2772 36608 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:57:02,387 log 2772 36608 "POST /api/auth/login/ HTTP/1.1" 429 53
+WARNING 2026-05-29 11:57:44,463 log 2772 6228 Too Many Requests: /api/auth/login/
+WARNING 2026-05-29 11:57:44,465 log 2772 6228 "POST /api/auth/login/ HTTP/1.1" 429 53
+INFO 2026-05-29 11:58:10,964 autoreload 34240 5544 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:58:11,143 autoreload 2772 28064 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-29 11:58:13,716 autoreload 29308 26060 Watching for file changes with StatReloader
+INFO 2026-05-29 11:58:14,210 autoreload 21032 29344 Watching for file changes with StatReloader
+INFO 2026-05-29 11:58:46,194 autoreload 31420 32108 Watching for file changes with StatReloader
+INFO 2026-05-29 11:58:54,887 log 21032 31800 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 11:59:27,117 log 21032 33816 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 12:00:03,994 log 21032 34552 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 12:00:05,449 log 21032 34552 "OPTIONS /api/auth/login/ HTTP/1.1" 200 0
+INFO 2026-05-29 12:00:33,158 log 21032 33816 "POST /api/auth/login/ HTTP/1.1" 200 610
+INFO 2026-05-29 12:25:20,768 autoreload 31420 32108 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-29 12:25:20,932 autoreload 21032 29344 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-29 12:25:24,263 autoreload 36804 13536 Watching for file changes with StatReloader
+INFO 2026-05-29 12:25:24,286 autoreload 36276 27396 Watching for file changes with StatReloader
+INFO 2026-05-29 12:27:51,692 autoreload 36804 13536 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\settings.py changed, reloading.
+INFO 2026-05-29 12:27:51,698 autoreload 36276 27396 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\settings.py changed, reloading.
+INFO 2026-05-29 12:27:53,861 autoreload 19868 25692 Watching for file changes with StatReloader
+INFO 2026-05-29 12:27:53,884 autoreload 30872 1908 Watching for file changes with StatReloader
+INFO 2026-05-29 12:28:43,470 autoreload 24920 14468 Watching for file changes with StatReloader
+INFO 2026-05-29 12:29:06,269 autoreload 28944 26668 Watching for file changes with StatReloader
+ERROR 2026-05-29 12:29:42,687 log 19868 30216 Internal Server Error: /api/auth/otp/request/
+ERROR 2026-05-29 12:29:42,688 log 19868 30216 "POST /api/auth/otp/request/ HTTP/1.1" 500 49
+INFO 2026-05-30 14:52:35,921 autoreload 27724 16416 Watching for file changes with StatReloader
+ERROR 2026-05-30 14:54:44,723 log 27724 13036 Internal Server Error: /api/auth/otp/request/
+ERROR 2026-05-30 14:54:44,725 log 27724 13036 "POST /api/auth/otp/request/ HTTP/1.1" 500 49
+INFO 2026-05-30 14:59:07,382 autoreload 27724 16416 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\otp_utils.py changed, reloading.
+INFO 2026-05-30 14:59:17,843 autoreload 29632 2904 Watching for file changes with StatReloader
+INFO 2026-05-30 14:59:35,969 autoreload 33608 33176 Watching for file changes with StatReloader
+INFO 2026-05-30 14:59:44,679 log 33608 28996 "POST /api/auth/otp/request/ HTTP/1.1" 200 82
+WARNING 2026-05-30 15:11:10,524 log 33608 34040 Bad Request: /api/auth/otp/verify/
+WARNING 2026-05-30 15:11:10,527 log 33608 34040 "POST /api/auth/otp/verify/ HTTP/1.1" 400 39
+INFO 2026-05-30 15:21:21,457 log 33608 4328 "POST /api/auth/otp/request/ HTTP/1.1" 200 82
+INFO 2026-05-30 15:23:42,445 autoreload 33608 33176 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\otp_utils.py changed, reloading.
+INFO 2026-05-30 15:23:46,906 autoreload 33180 11224 Watching for file changes with StatReloader
+INFO 2026-05-30 15:25:17,474 autoreload 1356 33764 Watching for file changes with StatReloader
+ERROR 2026-05-30 15:25:25,627 log 1356 14076 Internal Server Error: /api/auth/otp/request/
+ERROR 2026-05-30 15:25:25,630 log 1356 14076 "POST /api/auth/otp/request/ HTTP/1.1" 500 49
+ERROR 2026-05-30 15:31:12,366 log 1356 20236 Internal Server Error: /api/auth/otp/request/
+ERROR 2026-05-30 15:31:12,367 log 1356 20236 "POST /api/auth/otp/request/ HTTP/1.1" 500 49
+INFO 2026-05-30 15:32:06,285 autoreload 1356 33764 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\otp_utils.py changed, reloading.
+INFO 2026-05-30 15:32:09,774 autoreload 31672 6788 Watching for file changes with StatReloader
+INFO 2026-05-30 15:32:56,470 log 31672 300 "POST /api/auth/otp/request/ HTTP/1.1" 200 82
+INFO 2026-05-30 22:39:22,019 autoreload 31672 6788 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\settings.py changed, reloading.
+INFO 2026-05-30 22:39:41,989 autoreload 28332 34344 Watching for file changes with StatReloader
+INFO 2026-05-30 22:43:50,732 autoreload 28332 34344 C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\requests\certs.py changed, reloading.
+INFO 2026-05-30 22:43:55,428 autoreload 21044 28320 Watching for file changes with StatReloader
+INFO 2026-05-31 17:27:55,041 autoreload 22228 23056 Watching for file changes with StatReloader
+WARNING 2026-05-31 17:28:42,745 log 22228 11580 Not Found: /api/auth/auth/request/
+WARNING 2026-05-31 17:28:42,749 log 22228 11580 "POST /api/auth/auth/request/ HTTP/1.1" 404 4343
+WARNING 2026-05-31 17:29:30,518 log 22228 26512 Not Found: /api/auth/request/
+WARNING 2026-05-31 17:29:30,519 log 22228 26512 "POST /api/auth/request/ HTTP/1.1" 404 4328
+INFO 2026-05-31 17:29:44,269 autoreload 22228 23056 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 17:29:48,402 autoreload 22904 14076 Watching for file changes with StatReloader
+INFO 2026-05-31 17:30:30,974 autoreload 2688 25256 Watching for file changes with StatReloader
+INFO 2026-05-31 17:31:33,319 autoreload 2688 25256 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 17:31:36,961 autoreload 16068 17484 Watching for file changes with StatReloader
+INFO 2026-05-31 17:32:56,870 autoreload 16068 17484 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\models.py changed, reloading.
+INFO 2026-05-31 17:32:59,061 autoreload 28684 16748 Watching for file changes with StatReloader
+INFO 2026-05-31 17:33:48,402 autoreload 28684 16748 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\views.py changed, reloading.
+INFO 2026-05-31 17:33:50,460 autoreload 27020 6588 Watching for file changes with StatReloader
+INFO 2026-05-31 17:34:02,192 autoreload 27020 6588 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 17:34:04,250 autoreload 26428 28472 Watching for file changes with StatReloader
+INFO 2026-05-31 17:34:41,578 autoreload 7900 29436 Watching for file changes with StatReloader
+ERROR 2026-05-31 17:34:54,317 log 7900 23256 Internal Server Error: /api/auth/request/
+ERROR 2026-05-31 17:34:54,318 log 7900 23256 "POST /api/auth/request/ HTTP/1.1" 500 271
+INFO 2026-05-31 17:36:23,616 autoreload 7900 29436 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 17:36:26,278 autoreload 13224 28160 Watching for file changes with StatReloader
+INFO 2026-05-31 17:36:40,792 log 13224 16824 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:37:15,633 log 13224 3416 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:38:17,731 log 13224 22688 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:40:07,453 log 13224 21688 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:45:07,272 log 13224 28788 "POST /api/auth/status/ HTTP/1.1" 200 20
+INFO 2026-05-31 17:48:33,547 autoreload 21772 20188 Watching for file changes with StatReloader
+INFO 2026-05-31 17:48:57,176 log 21772 17956 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:49:24,213 log 21772 29200 "POST /api/auth/status/ HTTP/1.1" 200 20
+ERROR 2026-05-31 17:50:00,059 log 21772 26136 Internal Server Error: /api/auth/callback/
+Traceback (most recent call last):
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\sqlite3\base.py", line 359, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.IntegrityError: NOT NULL constraint failed: accounts_mpesatransaction.checkout_request_id
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\core\handlers\base.py", line 198, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\views\decorators\csrf.py", line 65, in _view_wrapper
+    return view_func(request, *args, **kwargs)
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\views\generic\base.py", line 106, in view
+    return self.dispatch(request, *args, **kwargs)
+           ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\rest_framework\views.py", line 515, in dispatch
+    response = self.handle_exception(exc)
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\rest_framework\views.py", line 475, in handle_exception
+    self.raise_uncaught_exception(exc)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\rest_framework\views.py", line 486, in raise_uncaught_exception
+    raise exc
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\rest_framework\views.py", line 512, in dispatch
+    response = handler(request, *args, **kwargs)
+  File "C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py", line 135, in post
+    MpesaTransaction.objects.create(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        checkout_request_id=checkout_request_id,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<2 lines>...
+        is_successful=False
+        ^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\query.py", line 669, in create
+    obj.save(force_insert=True, using=self.db)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\base.py", line 874, in save
+    self.save_base(
+    ~~~~~~~~~~~~~~^
+        using=using,
+        ^^^^^^^^^^^^
+    ...<2 lines>...
+        update_fields=update_fields,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\base.py", line 966, in save_base
+    updated = self._save_table(
+        raw,
+    ...<4 lines>...
+        update_fields,
+    )
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\base.py", line 1169, in _save_table
+    results = self._do_insert(
+        cls._base_manager, using, insert_fields, returning_fields, raw
+    )
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\base.py", line 1220, in _do_insert
+    return manager._insert(
+           ~~~~~~~~~~~~~~~^
+        [self],
+        ^^^^^^^
+    ...<3 lines>...
+        raw=raw,
+        ^^^^^^^^
+    )
+    ^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\query.py", line 1918, in _insert
+    return query.get_compiler(using=using).execute_sql(returning_fields)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\models\sql\compiler.py", line 1925, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\utils.py", line 94, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "C:\Users\Windows\AppData\Roaming\Python\Python314\site-packages\django\db\backends\sqlite3\base.py", line 359, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.IntegrityError: NOT NULL constraint failed: accounts_mpesatransaction.checkout_request_id
+ERROR 2026-05-31 17:50:00,077 log 21772 26136 "POST /api/auth/callback/ HTTP/1.1" 500 199908
+INFO 2026-05-31 17:53:10,619 autoreload 2172 9748 Watching for file changes with StatReloader
+INFO 2026-05-31 17:53:25,152 log 2172 24076 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 17:53:48,806 log 2172 30560 "POST /api/auth/status/ HTTP/1.1" 200 20
+WARNING 2026-05-31 17:55:09,366 log 2172 30448 Not Found: /api/auth/magic-link/request/
+WARNING 2026-05-31 17:55:09,366 log 2172 30448 "POST /api/auth/magic-link/request/ HTTP/1.1" 404 4617
+INFO 2026-05-31 17:58:41,083 autoreload 2172 9748 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 17:58:43,136 autoreload 17156 29496 Watching for file changes with StatReloader
+INFO 2026-05-31 17:58:51,314 autoreload 17156 29496 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 17:58:53,020 autoreload 19404 29156 Watching for file changes with StatReloader
+INFO 2026-05-31 17:59:47,472 autoreload 19404 29156 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 17:59:49,599 autoreload 18416 7636 Watching for file changes with StatReloader
+INFO 2026-05-31 17:59:55,802 autoreload 18416 7636 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 17:59:57,781 autoreload 14200 6672 Watching for file changes with StatReloader
+INFO 2026-05-31 18:00:48,808 log 14200 29860 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:01:50,174 log 14200 30496 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 18:02:16,769 log 14200 28700 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:02:50,582 log 14200 30120 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:02:57,270 log 14200 22392 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:03:02,563 log 14200 24656 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:03:07,768 log 14200 29536 "POST /api/auth/query/ HTTP/1.1" 200 51
+ERROR 2026-05-31 18:03:11,862 log 14200 15976 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:11,863 log 14200 15976 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:15,953 log 14200 13712 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:15,954 log 14200 13712 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:20,103 log 14200 25948 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:20,104 log 14200 25948 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:24,185 log 14200 17828 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:24,187 log 14200 17828 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:28,562 log 14200 30148 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:28,562 log 14200 30148 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:32,649 log 14200 27584 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:32,650 log 14200 27584 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:36,938 log 14200 23248 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:36,943 log 14200 23248 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:41,421 log 14200 27912 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:41,422 log 14200 27912 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:03:45,484 log 14200 28088 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:03:45,487 log 14200 28088 "POST /api/auth/query/ HTTP/1.1" 500 31
+INFO 2026-05-31 18:06:04,443 log 14200 25240 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 18:06:24,602 log 14200 17912 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:06:30,697 log 14200 13948 "POST /api/auth/query/ HTTP/1.1" 200 51
+INFO 2026-05-31 18:06:36,324 log 14200 28872 "POST /api/auth/query/ HTTP/1.1" 200 51
+ERROR 2026-05-31 18:06:40,430 log 14200 28532 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:06:40,430 log 14200 28532 "POST /api/auth/query/ HTTP/1.1" 500 31
+ERROR 2026-05-31 18:06:44,539 log 14200 3712 Internal Server Error: /api/auth/query/
+ERROR 2026-05-31 18:06:44,540 log 14200 3712 "POST /api/auth/query/ HTTP/1.1" 500 31
+INFO 2026-05-31 18:07:52,478 autoreload 14200 6672 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 18:07:54,411 autoreload 13440 30164 Watching for file changes with StatReloader
+INFO 2026-05-31 18:09:03,687 autoreload 13440 30164 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 18:09:05,764 autoreload 25984 1608 Watching for file changes with StatReloader
+INFO 2026-05-31 18:09:48,419 log 25984 29048 "POST /api/auth/request/ HTTP/1.1" 200 178
+INFO 2026-05-31 18:11:31,849 log 25984 5780 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:14:45,003 log 25984 22468 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:14:55,082 log 25984 28840 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:14:59,615 log 25984 23144 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:04,132 log 25984 10848 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:08,688 log 25984 30328 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:13,241 log 25984 24072 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:17,917 log 25984 17572 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:22,154 log 25984 24352 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:27,168 log 25984 19416 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:31,783 log 25984 16348 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:15:36,017 log 25984 18492 "POST /api/auth/query/ HTTP/1.1" 200 46
+INFO 2026-05-31 18:16:42,777 autoreload 25984 1608 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 18:16:44,492 autoreload 30296 20452 Watching for file changes with StatReloader
+INFO 2026-05-31 18:16:50,463 autoreload 30296 20452 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 18:16:52,165 autoreload 22756 30680 Watching for file changes with StatReloader
+INFO 2026-05-31 18:17:27,930 autoreload 22756 30680 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\urls.py changed, reloading.
+INFO 2026-05-31 18:17:30,188 autoreload 20244 29984 Watching for file changes with StatReloader
+INFO 2026-05-31 18:17:38,703 autoreload 20244 29984 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 18:17:40,579 autoreload 23248 28724 Watching for file changes with StatReloader
+INFO 2026-05-31 18:18:08,583 log 23248 22796 "POST /api/auth/test-success/ HTTP/1.1" 200 590
+INFO 2026-05-31 18:18:54,207 log 23248 16316 "POST /api/chatbot/ask/ HTTP/1.1" 200 288
+INFO 2026-05-31 18:19:03,425 log 23248 1856 "GET /api/constitution/search/?q=rights HTTP/1.1" 200 2198
+INFO 2026-05-31 18:19:10,043 log 23248 26444 "GET /api/auth/profile/ HTTP/1.1" 200 113
+INFO 2026-05-31 18:21:37,907 autoreload 23248 28724 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\__init__.py changed, reloading.
+INFO 2026-05-31 18:21:40,081 autoreload 18568 24544 Watching for file changes with StatReloader
+INFO 2026-05-31 18:21:42,845 autoreload 18568 24544 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\chatbot\models.py changed, reloading.
+INFO 2026-05-31 18:21:45,171 autoreload 25144 9908 Watching for file changes with StatReloader
+INFO 2026-05-31 18:21:48,254 autoreload 25144 9908 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\settings.py changed, reloading.
+INFO 2026-05-31 18:21:50,849 autoreload 23176 19732 Watching for file changes with StatReloader
+INFO 2026-05-31 18:21:54,373 autoreload 23176 19732 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
