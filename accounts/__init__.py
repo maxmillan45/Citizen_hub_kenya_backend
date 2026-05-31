@@ -1,1 +1,1 @@
-"""Accounts app for user management and authentication"""
+"""Accounts app for user authentication and management"""
