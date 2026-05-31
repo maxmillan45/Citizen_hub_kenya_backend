@@ -207,3 +207,4 @@ MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
 # Citizen Hub Kenya - Production Settings
 # All timestamps stored in Africa/Nairobi timezone
+# JWT tokens expire in 60 minutes, refresh tokens in 1 day
