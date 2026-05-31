@@ -45,7 +45,6 @@ class User(AbstractUser):
 
     # Custom manager to handle user creation without username field
 
-class MpesaTransaction(models.Model):
     checkout_request_id = models.CharField(max_length=100, unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     result_code = models.IntegerField()
