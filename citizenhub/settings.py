@@ -192,3 +192,17 @@ LOGGING = {
 # Create logs directory
 import os
 os.makedirs(BASE_DIR / 'logs', exist_ok=True)
+
+# Africa's Talking SMS Configuration
+AFRICASTALKING_USERNAME = os.getenv('AFRICASTALKING_USERNAME', 'sandbox')
+AFRICASTALKING_API_KEY = os.getenv('AFRICASTALKING_API_KEY', '')
+AFRICASTALKING_SENDER_ID = os.getenv('AFRICASTALKING_SENDER_ID', 'AFRICASTLK')
+
+# M-Pesa Configuration
+MPESA_ENVIRONMENT = os.getenv('MPESA_ENVIRONMENT', 'sandbox')
+MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY', '')
+MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET', '')
+MPESA_PASSKEY = os.getenv('MPESA_PASSKEY', '')
+MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
+MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
+# Citizen Hub Kenya - Production Settings
