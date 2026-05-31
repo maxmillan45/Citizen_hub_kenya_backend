@@ -2,8 +2,6 @@ from pathlib import Path
 from datetime import timedelta
 import os
 import environ
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
 
 # Initialize environment
 env = environ.Env()
@@ -17,7 +15,6 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 # Sentry Error Tracking
 if not DEBUG:
-    sentry_sdk.init(
         dsn=env('SENTRY_DSN', default=None),
         integrations=[DjangoIntegration()],
         traces_sample_rate=1.0,
