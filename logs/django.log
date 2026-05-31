@@ -358,3 +358,4 @@ INFO 2026-05-31 18:21:45,171 autoreload 25144 9908 Watching for file changes wit
 INFO 2026-05-31 18:21:48,254 autoreload 25144 9908 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\citizenhub\settings.py changed, reloading.
 INFO 2026-05-31 18:21:50,849 autoreload 23176 19732 Watching for file changes with StatReloader
 INFO 2026-05-31 18:21:54,373 autoreload 23176 19732 C:\Users\Windows\26k_zindua\django-projects\Citizen_hub_backend\accounts\mpesa_views.py changed, reloading.
+INFO 2026-05-31 18:21:56,740 autoreload 11568 14348 Watching for file changes with StatReloader
