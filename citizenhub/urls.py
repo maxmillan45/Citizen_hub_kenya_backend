@@ -18,3 +18,4 @@ urlpatterns = [
     path('api/constitution/', include('constitution.urls')),
     path('api/chatbot/', include('chatbot.urls')),
 ]
+# API routes: auth, constitution, chatbot endpoints
