@@ -25,3 +25,4 @@ class Article(models.Model):
     def __str__(self):
         return f"Article {self.article_number}: {self.title[:50]}"
 
+# Constitution article model with bilingual simplified versions
