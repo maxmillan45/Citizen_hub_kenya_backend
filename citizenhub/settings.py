@@ -208,3 +208,11 @@ MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
 # Citizen Hub Kenya - Production Settings
 # All timestamps stored in Africa/Nairobi timezone
 # JWT tokens expire in 60 minutes, refresh tokens in 1 day
+
+# Static files for Render
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# Middleware for static files
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
