@@ -16,3 +16,4 @@ class Conversation(models.Model):
     def __str__(self):
         return f"{self.user.phone_number}: {self.question[:50]}"
 # Chatbot models store all user questions and AI responses for conversation history
+# Conversation model for storing user chatbot interactions
