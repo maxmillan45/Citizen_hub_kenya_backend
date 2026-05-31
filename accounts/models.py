@@ -44,3 +44,15 @@ class User(AbstractUser):
     # Custom user model using phone number instead of username
 
     # Custom manager to handle user creation without username field
+
+class MpesaTransaction(models.Model):
+    checkout_request_id = models.CharField(max_length=100, unique=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    result_code = models.IntegerField()
+    result_desc = models.CharField(max_length=200)
+    is_successful = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.checkout_request_id} - {self.result_desc}"
+# Custom user model using phone number as username
