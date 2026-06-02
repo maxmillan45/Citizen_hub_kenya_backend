@@ -111,3 +111,18 @@ MPESA_PASSKEY = os.getenv('MPESA_PASSKEY', '')
 MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
 MPESA_ENVIRONMENT = os.getenv('MPESA_ENVIRONMENT', 'sandbox')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', '')
+
+# Database - Use PostgreSQL if DATABASE_URL exists
+import dj_database_url
+DATABASE_URL = os.getenv('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
