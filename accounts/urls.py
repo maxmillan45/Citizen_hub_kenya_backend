@@ -22,3 +22,7 @@ urlpatterns = [
     path('voting/', VotingStatusView.as_view(), name='voting'),
     path('events/', EventListView.as_view(), name='events'),
 ]
+from .load_data_view import LoadDataView
+
+# Add this line to urlpatterns
+    path('data-status/', LoadDataView.as_view(), name='data-status'),
