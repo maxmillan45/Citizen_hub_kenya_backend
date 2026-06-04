@@ -27,3 +27,7 @@ urlpatterns = [
 from .constitution_proxy import ConstitutionSearchProxy
 
     path('constitution-search/', ConstitutionSearchProxy.as_view(), name='constitution-search'),
+from .history_view import HistoryView, RandomHistoryView
+
+    path('history-fixed/', HistoryView.as_view(), name='history-fixed'),
+    path('history-fixed/random/', RandomHistoryView.as_view(), name='history-fixed-random'),
