@@ -1,5 +1,5 @@
 from django.urls import path
-from .mpesa_views import RequestSTKPushView, TestAuthSuccessView
+from .mpesa_views import RequestSTKPushView, TestAuthSuccessView, QueryStatusView
 from .views import RegisterView, LoginView, LogoutView, ProfileView
 from .feature_views import (
     DidYouKnowListView, DidYouKnowRandomView,
@@ -13,6 +13,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('stk/request/', RequestSTKPushView.as_view(), name='stk-request'),
+    path('stk/query/', QueryStatusView.as_view(), name='stk-query'),
     path('test-success/', TestAuthSuccessView.as_view(), name='test-success'),
     path('history/', DidYouKnowListView.as_view(), name='history'),
     path('history/random/', DidYouKnowRandomView.as_view(), name='history-random'),
