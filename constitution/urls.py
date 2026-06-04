@@ -6,3 +6,8 @@ urlpatterns = [
     path('article/<str:article_number>/', ArticleDetailView.as_view(), name='article-detail'),
 ]
 
+from .debug_view import DebugView
+
+urlpatterns += [
+    path('debug/', DebugView.as_view(), name='debug'),
+]
