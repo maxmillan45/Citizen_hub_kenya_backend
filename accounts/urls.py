@@ -6,7 +6,6 @@ from .feature_views import (
     FAQListView, MPListView,
     CrimeReportView, VotingStatusView, EventListView
 )
-from .migration_views import RunMigrationsView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -22,12 +21,4 @@ urlpatterns = [
     path('crime/', CrimeReportView.as_view(), name='crime'),
     path('voting/', VotingStatusView.as_view(), name='voting'),
     path('events/', EventListView.as_view(), name='events'),
-    path('migrate/', RunMigrationsView.as_view(), name='migrate'),
 ]
-from .constitution_proxy import ConstitutionSearchProxy
-
-    path('constitution-search/', ConstitutionSearchProxy.as_view(), name='constitution-search'),
-from .history_view import HistoryView, RandomHistoryView
-
-    path('history-fixed/', HistoryView.as_view(), name='history-fixed'),
-    path('history-fixed/random/', RandomHistoryView.as_view(), name='history-fixed-random'),
