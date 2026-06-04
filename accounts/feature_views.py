@@ -2,23 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import DidYouKnowFact, FAQ, MP
+from .models import DidYouKnowFact, FAQ, MP, PublicEvent
 
 class DidYouKnowListView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
         facts = DidYouKnowFact.objects.all().order_by('-id')
-        data = []
-        for f in facts:
-            data.append({
-                'id': f.id,
-                'title': f.title,
-                'content': f.content,
-                'image_url': f.image_url,
-                'category': f.category,
-                'year': f.year
-            })
+        data = [{'id': f.id, 'title': f.title, 'content': f.content, 'image_url': f.image_url, 'category': f.category, 'year': f.year} for f in facts]
         return Response(data)
 
 class DidYouKnowRandomView(APIView):
@@ -30,15 +21,8 @@ class DidYouKnowRandomView(APIView):
         if count == 0:
             return Response({'error': 'No facts available'}, status=404)
         random_index = random.randint(0, count - 1)
-        f = DidYouKnowFact.objects.all()[random_index]
-        data = {
-            'id': f.id,
-            'title': f.title,
-            'content': f.content,
-            'image_url': f.image_url,
-            'category': f.category,
-            'year': f.year
-        }
+        fact = DidYouKnowFact.objects.all()[random_index]
+        data = {'id': fact.id, 'title': fact.title, 'content': fact.content, 'image_url': fact.image_url, 'category': fact.category, 'year': fact.year}
         return Response(data)
 
 class FAQListView(APIView):
@@ -64,7 +48,21 @@ class EventListView(APIView):
     permission_classes = [AllowAny]
     
     def get(self, request):
-        return Response([])
+        events = PublicEvent.objects.filter(is_active=True).order_by('event_date')
+        data = []
+        for e in events:
+            data.append({
+                'id': e.id,
+                'name': e.name,
+                'event_type': e.event_type,
+                'description': e.description,
+                'event_date': e.event_date,
+                'county': e.county,
+                'location': e.location,
+                'start_time': e.start_time.strftime('%H:%M') if e.start_time else None,
+                'end_time': e.end_time.strftime('%H:%M') if e.end_time else None,
+            })
+        return Response(data)
 
 class CrimeReportView(APIView):
     permission_classes = [IsAuthenticated]
