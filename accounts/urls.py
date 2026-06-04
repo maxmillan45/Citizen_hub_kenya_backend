@@ -24,3 +24,6 @@ urlpatterns = [
     path('events/', EventListView.as_view(), name='events'),
     path('migrate/', RunMigrationsView.as_view(), name='migrate'),
 ]
+from .constitution_proxy import ConstitutionSearchProxy
+
+    path('constitution-search/', ConstitutionSearchProxy.as_view(), name='constitution-search'),
