@@ -21,6 +21,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
+     'drf_yasg', 
     'accounts',
     'constitution',
     'chatbot',
@@ -156,3 +157,14 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# Static files configuration
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# For development, serve static files
+if DEBUG:
+    STATICFILES_DIRS.append(BASE_DIR / 'static')
