@@ -245,3 +245,4 @@ class EventAttendance(models.Model):
     
     class Meta:
         unique_together = ['user', 'event']
+# New migration trigger

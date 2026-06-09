@@ -1,11 +1,12 @@
 from django.urls import path
-from .mpesa_views import RequestSTKPushView, TestAuthSuccessView
+from .mpesa_views import RequestSTKPushView, QueryStatusView, TestAuthSuccessView
 from .views import RegisterView, LoginView, LogoutView, ProfileView
 from .feature_views import (
     DidYouKnowListView, DidYouKnowRandomView,
     FAQListView, MPListView,
     CrimeReportView, VotingStatusView, EventListView
 )
+from .user_stats import UserStatisticsView
 
 urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
@@ -13,6 +14,7 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('stk/request/', RequestSTKPushView.as_view(), name='stk-request'),
+    path('stk/query/', QueryStatusView.as_view(), name='stk-query'),
     path('test-success/', TestAuthSuccessView.as_view(), name='test-success'),
     path('history/', DidYouKnowListView.as_view(), name='history'),
     path('history/random/', DidYouKnowRandomView.as_view(), name='history-random'),
@@ -21,4 +23,5 @@ urlpatterns = [
     path('crime/', CrimeReportView.as_view(), name='crime'),
     path('voting/', VotingStatusView.as_view(), name='voting'),
     path('events/', EventListView.as_view(), name='events'),
+    path('stats/', UserStatisticsView.as_view(), name='user-stats'),
 ]
