@@ -25,3 +25,13 @@ urlpatterns = [
     path('events/', EventListView.as_view(), name='events'),
     path('stats/', UserStatisticsView.as_view(), name='user-stats'),
 ]
+from .mp_views import MPSearchView, MPCompareView, MPPerformanceDetailView
+
+    path('mp/search/', MPSearchView.as_view(), name='mp-search'),
+    path('mp/compare/', MPCompareView.as_view(), name='mp-compare'),
+    path('mp/<int:mp_id>/performance/', MPPerformanceDetailView.as_view(), name='mp-performance'),
+from .event_views import UpcomingEventsView, EventCountiesView, SetEventReminderView
+
+    path('events/upcoming/', UpcomingEventsView.as_view(), name='events-upcoming'),
+    path('events/counties/', EventCountiesView.as_view(), name='events-counties'),
+    path('events/<int:event_id>/reminder/', SetEventReminderView.as_view(), name='event-reminder'),

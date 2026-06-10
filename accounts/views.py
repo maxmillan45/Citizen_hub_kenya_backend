@@ -60,7 +60,34 @@ class ProfileView(APIView):
         if 'language' in request.data:
             user.language = request.data['language']
             user.save()
+        if 'notification_preferences' in request.data:
+            # Add notification preferences to user model
+            pass
         return Response(UserSerializer(user).data)
+    
+    def delete(self, request):
+        """Delete user account - Data Protection Act compliance"""
+        user = request.user
+        user.delete()
+        return Response({'message': 'Account deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+
+
+class ChangePhoneView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        new_phone = request.data.get('new_phone_number')
+        if not new_phone:
+            return Response({'error': 'New phone number required'}, status=400)
+        
+        if User.objects.filter(phone_number=new_phone).exists():
+            return Response({'error': 'Phone number already in use'}, status=400)
+        
+        user = request.user
+        user.phone_number = new_phone
+        user.save()
+        
+        return Response({'message': 'Phone number updated successfully'})
 
 
 class LogoutView(APIView):
@@ -75,4 +102,3 @@ class LogoutView(APIView):
             return Response({'message': 'Logged out successfully'})
         except Exception:
             return Response({'message': 'Logged out successfully'})
-# Authentication views: register, login, profile
