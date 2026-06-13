@@ -1,37 +1,48 @@
 from django.urls import path
-from .mpesa_views import RequestSTKPushView, QueryStatusView, TestAuthSuccessView
-from .views import RegisterView, LoginView, LogoutView, ProfileView
-from .feature_views import (
-    DidYouKnowListView, DidYouKnowRandomView,
-    FAQListView, MPListView,
-    CrimeReportView, VotingStatusView, EventListView
-)
-from .user_stats import UserStatisticsView
+from . import views
+from . import feature_views
+from . import mpesa_views
+from . import crud_views
+from . import admin_analytics
 
 urlpatterns = [
-    path('register/', RegisterView.as_view(), name='register'),
-    path('login/', LoginView.as_view(), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('profile/', ProfileView.as_view(), name='profile'),
-    path('stk/request/', RequestSTKPushView.as_view(), name='stk-request'),
-    path('stk/query/', QueryStatusView.as_view(), name='stk-query'),
-    path('test-success/', TestAuthSuccessView.as_view(), name='test-success'),
-    path('history/', DidYouKnowListView.as_view(), name='history'),
-    path('history/random/', DidYouKnowRandomView.as_view(), name='history-random'),
-    path('faq/', FAQListView.as_view(), name='faq'),
-    path('mp/', MPListView.as_view(), name='mp'),
-    path('crime/', CrimeReportView.as_view(), name='crime'),
-    path('voting/', VotingStatusView.as_view(), name='voting'),
-    path('events/', EventListView.as_view(), name='events'),
-    path('stats/', UserStatisticsView.as_view(), name='user-stats'),
+    path('register/', views.RegisterView.as_view(), name='register'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('profile/', views.ProfileView.as_view(), name='profile'),
+    path('test-success/', views.TestAuthSuccessView.as_view(), name='test-success'),
+    path('stk/request/', mpesa_views.RequestSTKPushView.as_view(), name='stk-request'),
+    path('stk/callback/', mpesa_views.MPesaCallbackView.as_view(), name='stk-callback'),
+    path('history/', feature_views.DidYouKnowListView.as_view(), name='history'),
+    path('faq/', feature_views.FAQListView.as_view(), name='faq-list'),
+    path('mp/', feature_views.MPListView.as_view(), name='mp-list'),
+    path('events/', feature_views.EventListView.as_view(), name='event-list'),
+    path('crime/', feature_views.CrimeReportView.as_view(), name='crime-report'),
+    path('voting/', feature_views.VotingStatusView.as_view(), name='voting-status'),
+    path('faq/<uuid:pk>/', crud_views.FAQDetailView.as_view(), name='faq-detail'),
+    path('mp/<uuid:pk>/', crud_views.MPDetailView.as_view(), name='mp-detail'),
+    path('faq/bulk-delete/', crud_views.BulkFAQDeleteView.as_view(), name='faq-bulk-delete'),
+    path('crime/export/csv/', crud_views.ExportCrimeReportsView.as_view(), name='crime-export'),
+    path('admin/stats/', admin_analytics.AdminStatsView.as_view(), name='admin-stats'),
 ]
-from .mp_views import MPSearchView, MPCompareView, MPPerformanceDetailView
+from .admin_monitoring import (
+    DashboardStatsView, UserManagementView, CrimeReportManagementView,
+    FAQManagementView, PaymentMonitoringView, SystemSettingsView
+)
 
-    path('mp/search/', MPSearchView.as_view(), name='mp-search'),
-    path('mp/compare/', MPCompareView.as_view(), name='mp-compare'),
-    path('mp/<int:mp_id>/performance/', MPPerformanceDetailView.as_view(), name='mp-performance'),
-from .event_views import UpcomingEventsView, EventCountiesView, SetEventReminderView
+urlpatterns += [
+    path('admin/dashboard/', DashboardStatsView.as_view(), name='admin-dashboard'),
+    path('admin/users/', UserManagementView.as_view(), name='admin-users'),
+    path('admin/users/<uuid:user_id>/', UserManagementView.as_view(), name='admin-user-update'),
+    path('admin/crimes/', CrimeReportManagementView.as_view(), name='admin-crimes'),
+    path('admin/crimes/<uuid:report_id>/', CrimeReportManagementView.as_view(), name='admin-crime-update'),
+    path('admin/faqs/', FAQManagementView.as_view(), name='admin-faqs'),
+    path('admin/payments/', PaymentMonitoringView.as_view(), name='admin-payments'),
+    path('admin/settings/', SystemSettingsView.as_view(), name='admin-settings'),
+]
+from .views import LogoutView, ChangePasswordView, ForgotPasswordView
 
-    path('events/upcoming/', UpcomingEventsView.as_view(), name='events-upcoming'),
-    path('events/counties/', EventCountiesView.as_view(), name='events-counties'),
-    path('events/<int:event_id>/reminder/', SetEventReminderView.as_view(), name='event-reminder'),
+urlpatterns += [
+    path('logout/', LogoutView.as_view(), name='logout'),
+    path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+]

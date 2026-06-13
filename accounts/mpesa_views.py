@@ -1,188 +1,208 @@
-import logging
-logger = logging.getLogger(__name__)
-
-import requests
-import base64
-from datetime import datetime
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework import status
 from django.conf import settings
-from django.utils import timezone
-from django.core.cache import cache
-from .models import User
+import requests
+import json
+import base64
+from datetime import datetime
+from .models import MpesaTransaction
 
 class MPesaAuth:
-    def __init__(self):
-        self.consumer_key = settings.MPESA_CONSUMER_KEY
-        self.consumer_secret = settings.MPESA_CONSUMER_SECRET
-        self.passkey = settings.MPESA_PASSKEY
-        self.shortcode = settings.MPESA_SHORTCODE
-        self.environment = getattr(settings, 'MPESA_ENVIRONMENT', 'sandbox')
+    @staticmethod
+    def get_access_token():
+        consumer_key = settings.MPESA_CONSUMER_KEY
+        consumer_secret = settings.MPESA_CONSUMER_SECRET
         
-        if self.environment == 'sandbox':
-            self.base_url = 'https://sandbox.safaricom.co.ke'
-        else:
-            self.base_url = 'https://api.safaricom.co.ke'
-    
-    def get_access_token(self):
-        cache_key = 'mpesa_access_token'
-        token = cache.get(cache_key)
-        if token:
-            return token
+        if not consumer_key or not consumer_secret:
+            return None
         
-        auth_url = f"{self.base_url}/oauth/v1/generate?grant_type=client_credentials"
-        auth_string = f"{self.consumer_key}:{self.consumer_secret}"
+        auth_string = f"{consumer_key}:{consumer_secret}"
         auth_bytes = auth_string.encode('ascii')
-        auth_b64 = base64.b64encode(auth_bytes).decode('ascii')
+        auth_base64 = base64.b64encode(auth_bytes).decode('ascii')
         
-        headers = {'Authorization': f'Basic {auth_b64}'}
-        response = requests.get(auth_url, headers=headers, timeout=30)
+        headers = {
+            'Authorization': f'Basic {auth_base64}'
+        }
         
-        if response.status_code == 200:
-            token = response.json().get('access_token')
-            cache.set(cache_key, token, timeout=3500)
-            return token
-        return None
-
-mpesa_auth = MPesaAuth()
+        url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+        
+        try:
+            response = requests.get(url, headers=headers, timeout=30)
+            response.raise_for_status()
+            return response.json().get('access_token')
+        except requests.RequestException:
+            return None
 
 class RequestSTKPushView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
         phone_number = request.data.get('phone_number')
-        if not phone_number:
-            return Response({'error': 'Phone number required'}, status=400)
+        amount = request.data.get('amount')
+        account_reference = request.data.get('account_reference', 'CitizenHub')
+        transaction_desc = request.data.get('transaction_desc', 'Payment to Citizen Hub')
         
+        if not phone_number or not amount:
+            return Response({
+                'error': 'Phone number and amount are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Format phone number (remove 0 or +254)
         if phone_number.startswith('0'):
-            formatted = '254' + phone_number[1:]
-        else:
-            formatted = phone_number
+            phone_number = '254' + phone_number[1:]
+        elif phone_number.startswith('+'):
+            phone_number = phone_number[1:]
         
-        token = mpesa_auth.get_access_token()
-        if not token:
-            return Response({'error': 'Failed to authenticate with M-Pesa'}, status=500)
+        access_token = MPesaAuth.get_access_token()
+        if not access_token:
+            return Response({
+                'error': 'Failed to authenticate with M-Pesa'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-        password_str = f"{mpesa_auth.shortcode}{mpesa_auth.passkey}{timestamp}"
-        password = base64.b64encode(password_str.encode()).decode()
+        passkey = settings.MPESA_PASSKEY
+        shortcode = settings.MPESA_SHORTCODE
         
-        headers = {'Authorization': f'Bearer {token}', 'Content-Type': 'application/json'}
+        password_str = f"{shortcode}{passkey}{timestamp}"
+        password_bytes = password_str.encode('ascii')
+        password = base64.b64encode(password_bytes).decode('ascii')
+        
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+        
         payload = {
-            'BusinessShortCode': mpesa_auth.shortcode,
+            'BusinessShortCode': shortcode,
             'Password': password,
             'Timestamp': timestamp,
             'TransactionType': 'CustomerPayBillOnline',
-            'Amount': 1,
-            'PartyA': formatted,
-            'PartyB': mpesa_auth.shortcode,
-            'PhoneNumber': formatted,
+            'Amount': amount,
+            'PartyA': phone_number,
+            'PartyB': shortcode,
+            'PhoneNumber': phone_number,
             'CallBackURL': settings.MPESA_CALLBACK_URL,
-            'AccountReference': 'CITIZEN_HUB_AUTH',
-            'TransactionDesc': 'Identity Verification'
+            'AccountReference': account_reference,
+            'TransactionDesc': transaction_desc
         }
         
-        response = requests.post(
-            f"{mpesa_auth.base_url}/mpesa/stkpush/v1/processrequest",
-            headers=headers, json=payload, timeout=30
-        )
+        url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
         
-        if response.status_code == 200:
-            data = response.json()
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            response_data = response.json()
+            
+            # Save transaction
+            MpesaTransaction.objects.create(
+                phone_number=phone_number,
+                amount=amount,
+                account_reference=account_reference,
+                transaction_desc=transaction_desc,
+                checkout_request_id=response_data.get('CheckoutRequestID'),
+                response_code=response_data.get('ResponseCode'),
+                response_description=response_data.get('ResponseDescription')
+            )
+            
+            return Response(response_data)
+        except requests.RequestException as e:
             return Response({
-                'message': 'Check your M-Pesa app',
-                'checkout_request_id': data.get('CheckoutRequestID'),
-                'response_code': data.get('ResponseCode'),
-                'response_description': data.get('ResponseDescription')
-            })
-        return Response({'error': 'STK push failed', 'details': response.text}, status=500)
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-
-class QueryStatusView(APIView):
+class MPesaCallbackView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        checkout_request_id = request.data.get('checkout_request_id')
+        callback_data = request.data
         
-        if not checkout_request_id:
-            return Response({'error': 'Checkout request ID required'}, status=400)
-        
-        # For demo/development - auto-success after 10 seconds
-        # This allows testing without full M-Pesa callback
-        
-        # Check if this is a demo transaction (for testing)
-        import time
-        import hashlib
-        
-        # Create a deterministic success after a delay based on the ID
-        hash_val = int(hashlib.md5(checkout_request_id.encode()).hexdigest()[:8], 16)
-        delay = hash_val % 15  # 0-15 seconds delay
-        
-        # For demo purposes, we'll simulate success
-        # In production, this would query the actual M-Pesa API
-        
-        # Simulate processing time
-        current_time = int(time.time())
-        request_time = int(hash_val) % 1000000
-        
-        # For testing with your phone number 0705632334
-        if '705632334' in checkout_request_id:
-            # Auto-success for your test number after short delay
-            import random
-            if random.randint(1, 3) > 1:
-                # Create or get user
-                user, created = User.objects.get_or_create(
-                    phone_number='0705632334',
-                    defaults={'is_active': True}
-                )
-                user.last_active = timezone.now()
-                user.save()
+        try:
+            body = callback_data.get('Body', {})
+            stk_callback = body.get('stkCallback', {})
+            
+            checkout_request_id = stk_callback.get('CheckoutRequestID')
+            result_code = stk_callback.get('ResultCode')
+            result_desc = stk_callback.get('ResultDesc')
+            
+            # Update transaction
+            transaction = MpesaTransaction.objects.filter(
+                checkout_request_id=checkout_request_id
+            ).first()
+            
+            if transaction:
+                transaction.result_code = result_code
+                transaction.result_description = result_desc
+                transaction.is_completed = (result_code == '0')
                 
-                refresh = RefreshToken.for_user(user)
+                if result_code == '0':
+                    callback_metadata = stk_callback.get('CallbackMetadata', {})
+                    items = callback_metadata.get('Item', [])
+                    for item in items:
+                        if item.get('Name') == 'Amount':
+                            transaction.amount = item.get('Value')
+                        elif item.get('Name') == 'MpesaReceiptNumber':
+                            transaction.mpesa_receipt_number = item.get('Value')
+                        elif item.get('Name') == 'TransactionDate':
+                            transaction.transaction_date = item.get('Value')
                 
-                return Response({
-                    'status': 'success',
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh),
-                    'user': {
-                        'id': user.id,
-                        'phone_number': user.phone_number,
-                        'civic_score': user.civic_score,
-                        'account_type': user.account_type
-                    }
-                })
-        
-        # Default pending response
-        return Response({'status': 'pending', 'message': 'Processing...'})
+                transaction.save()
+            
+            return Response({
+                'status': 'success',
+                'message': 'Callback received'
+            })
+        except Exception as e:
+            return Response({
+                'status': 'error',
+                'message': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class QueryStatusView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, checkout_request_id):
+        access_token = MPesaAuth.get_access_token()
+        if not access_token:
+            return Response({
+                'error': 'Failed to authenticate with M-Pesa'
+            }, status=status.HTTP_500_INTERNAL_SERVER_API)
+        
+        shortcode = settings.MPESA_SHORTCODE
+        passkey = settings.MPESA_PASSKEY
+        timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+        
+        password_str = f"{shortcode}{passkey}{timestamp}"
+        password_bytes = password_str.encode('ascii')
+        password = base64.b64encode(password_bytes).decode('ascii')
+        
+        headers = {
+            'Authorization': f'Bearer {access_token}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'BusinessShortCode': shortcode,
+            'Password': password,
+            'Timestamp': timestamp,
+            'CheckoutRequestID': checkout_request_id
+        }
+        
+        url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+        
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            return Response(response.json())
+        except requests.RequestException as e:
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class TestAuthSuccessView(APIView):
     permission_classes = [AllowAny]
     
     def post(self, request):
-        phone_number = request.data.get('phone_number')
-        if not phone_number:
-            return Response({'error': 'Phone number required'}, status=400)
-        
-        user, created = User.objects.get_or_create(
-            phone_number=phone_number,
-            defaults={'is_active': True}
-        )
-        user.last_active = timezone.now()
-        user.save()
-        
-        refresh = RefreshToken.for_user(user)
-        
         return Response({
-            'status': 'success',
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-            'user': {
-                'id': user.id,
-                'phone_number': user.phone_number,
-                'civic_score': user.civic_score,
-                'account_type': user.account_type
-            }
+            'message': 'Test auth success',
+            'status': 'ok'
         })

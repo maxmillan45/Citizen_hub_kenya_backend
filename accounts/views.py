@@ -1,104 +1,106 @@
-from rest_framework.views import APIView
+from rest_framework import status, permissions
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User
-from .serializers import UserSerializer
+from django.contrib.auth import authenticate
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ChangePasswordSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
-
+    permission_classes = [permissions.AllowAny]
+    
     def post(self, request):
-        phone_number = request.data.get('phone_number')
-        
-        if not phone_number:
-            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        if User.objects.filter(phone_number=phone_number).exists():
-            return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        user = User.objects.create_user(phone_number=phone_number)
-        
-        return Response({
-            'message': 'User registered successfully',
-            'phone_number': user.phone_number
-        }, status=status.HTTP_201_CREATED)
-
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'user': UserSerializer(user).data,
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]
-
+    permission_classes = [permissions.AllowAny]
+    
     def post(self, request):
-        phone_number = request.data.get('phone_number')
-        
-        if not phone_number:
-            return Response({'error': 'Phone number is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            user = User.objects.get(phone_number=phone_number)
-            refresh = RefreshToken.for_user(user)
-            
-            return Response({
-                'access': str(refresh.access_token),
-                'refresh': str(refresh),
-                'user': UserSerializer(user).data
-            })
-        except User.DoesNotExist:
-            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
-
+        serializer = LoginSerializer(data=request.data)
+        if serializer.is_valid():
+            user = authenticate(
+                request,
+                username=serializer.validated_data['phone_number'],
+                password=serializer.validated_data['password']
+            )
+            if user:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'user': UserSerializer(user).data,
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                })
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [permissions.IsAuthenticated]
+    
     def get(self, request):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
     
     def patch(self, request):
-        user = request.user
-        if 'language' in request.data:
-            user.language = request.data['language']
-            user.save()
-        if 'notification_preferences' in request.data:
-            # Add notification preferences to user model
-            pass
-        return Response(UserSerializer(user).data)
-    
-    def delete(self, request):
-        """Delete user account - Data Protection Act compliance"""
-        user = request.user
-        user.delete()
-        return Response({'message': 'Account deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        serializer = UserSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class ChangePhoneView(APIView):
-    permission_classes = [IsAuthenticated]
+class TestAuthSuccessView(APIView):
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
-        new_phone = request.data.get('new_phone_number')
-        if not new_phone:
-            return Response({'error': 'New phone number required'}, status=400)
-        
-        if User.objects.filter(phone_number=new_phone).exists():
-            return Response({'error': 'Phone number already in use'}, status=400)
-        
-        user = request.user
-        user.phone_number = new_phone
-        user.save()
-        
-        return Response({'message': 'Phone number updated successfully'})
-
+        return Response({"message": "Test auth success", "status": "ok"})
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-
+    permission_classes = [permissions.IsAuthenticated]
+    
     def post(self, request):
         try:
             refresh_token = request.data.get('refresh')
-            if refresh_token:
-                token = RefreshToken(refresh_token)
-                token.blacklist()
+            token = RefreshToken(refresh_token)
+            token.blacklist()
             return Response({'message': 'Logged out successfully'})
         except Exception:
-            return Response({'message': 'Logged out successfully'})
+            return Response({'message': 'Logged out'}, status=status.HTTP_200_OK)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            user = request.user
+            if not user.check_password(serializer.validated_data['old_password']):
+                return Response({'error': 'Wrong password'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user.set_password(serializer.validated_data['new_password'])
+            user.save()
+            return Response({'message': 'Password changed successfully'})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ForgotPasswordView(APIView):
+    permission_classes = [permissions.AllowAny]
+    
+    def post(self, request):
+        phone_number = request.data.get('phone_number')
+        try:
+            user = User.objects.get(phone_number=phone_number)
+            # Generate OTP and send SMS (implement SMS sending)
+            return Response({'message': 'Password reset link sent'})
+        except User.DoesNotExist:
+            return Response({'message': 'If account exists, reset link sent'}, status=status.HTTP_200_OK)

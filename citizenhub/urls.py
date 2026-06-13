@@ -17,3 +17,7 @@ urlpatterns = [
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+from .health_views import HealthCheckView
+
+# Add to urlpatterns:
+# path('health/', HealthCheckView.as_view(), name='health-check'),

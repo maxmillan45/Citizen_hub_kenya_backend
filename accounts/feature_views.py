@@ -1,80 +1,73 @@
-from rest_framework.views import APIView
+from django.utils import timezone
+from rest_framework import generics, permissions, filters
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import DidYouKnowFact, FAQ, MP, PublicEvent
+from rest_framework.views import APIView
+from django_filters.rest_framework import DjangoFilterBackend
+from .models import DidYouKnowFact, FAQ, MP, PublicEvent, CrimeReport, VotingRecord
+from .serializers import (
+    DidYouKnowFactSerializer, FAQSerializer, MPSerializer, 
+    PublicEventSerializer, CrimeReportSerializer, VotingRecordSerializer
+)
 
-class DidYouKnowListView(APIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        facts = DidYouKnowFact.objects.all().order_by('-id')
-        data = [{'id': f.id, 'title': f.title, 'content': f.content, 'image_url': f.image_url, 'category': f.category, 'year': f.year} for f in facts]
-        return Response(data)
+class DidYouKnowListView(generics.ListAPIView):
+    queryset = DidYouKnowFact.objects.all()
+    serializer_class = DidYouKnowFactSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'year']
+    search_fields = ['title', 'content']
+    ordering_fields = ['year', 'created_at']
+    ordering = ['-year']
 
-class DidYouKnowRandomView(APIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        import random
-        count = DidYouKnowFact.objects.count()
-        if count == 0:
-            return Response({'error': 'No facts available'}, status=404)
-        random_index = random.randint(0, count - 1)
-        fact = DidYouKnowFact.objects.all()[random_index]
-        data = {'id': fact.id, 'title': fact.title, 'content': fact.content, 'image_url': fact.image_url, 'category': fact.category, 'year': fact.year}
-        return Response(data)
+class FAQListView(generics.ListAPIView):
+    queryset = FAQ.objects.all()
+    serializer_class = FAQSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category']
+    search_fields = ['question', 'answer']
+    ordering_fields = ['created_at', 'question', 'views']
+    ordering = ['-created_at']
 
-class FAQListView(APIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        category = request.query_params.get('category')
-        queryset = FAQ.objects.all()
-        if category:
-            queryset = queryset.filter(category=category)
-        data = [{'id': f.id, 'question': f.question, 'answer': f.answer, 'category': f.category} for f in queryset]
-        return Response(data)
+class MPListView(generics.ListAPIView):
+    queryset = MP.objects.all()
+    serializer_class = MPSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['party', 'constituency']
+    search_fields = ['name', 'constituency', 'party']
+    ordering_fields = ['name', 'party', 'constituency']
+    ordering = ['name']
 
-class MPListView(APIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        mps = MP.objects.all()
-        data = [{'id': m.id, 'name': m.name, 'constituency': m.constituency, 'party': m.party} for m in mps]
-        return Response(data)
-
-class EventListView(APIView):
-    permission_classes = [AllowAny]
-    
-    def get(self, request):
-        events = PublicEvent.objects.filter(is_active=True).order_by('event_date')
-        data = []
-        for e in events:
-            data.append({
-                'id': e.id,
-                'name': e.name,
-                'event_type': e.event_type,
-                'description': e.description,
-                'event_date': e.event_date,
-                'county': e.county,
-                'location': e.location,
-                'start_time': e.start_time.strftime('%H:%M') if e.start_time else None,
-                'end_time': e.end_time.strftime('%H:%M') if e.end_time else None,
-            })
-        return Response(data)
+class EventListView(generics.ListAPIView):
+    queryset = PublicEvent.objects.all()
+    serializer_class = PublicEventSerializer
+    permission_classes = [permissions.AllowAny]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'location', 'is_free']
+    search_fields = ['title', 'description', 'location']
+    ordering_fields = ['date', 'created_at']
+    ordering = ['date']
 
 class CrimeReportView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def post(self, request):
-        return Response({'message': 'Crime report submitted'}, status=201)
+        serializer = CrimeReportSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(reported_by=request.user)
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
     
     def get(self, request):
-        return Response([])
+        reports = CrimeReport.objects.filter(reported_by=request.user)
+        serializer = CrimeReportSerializer(reports, many=True)
+        return Response(serializer.data)
 
 class VotingStatusView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
     
     def get(self, request):
-        return Response({'status': 'Not verified'})
+        voting_records = VotingRecord.objects.filter(user=request.user)
+        serializer = VotingRecordSerializer(voting_records, many=True)
+        return Response(serializer.data)

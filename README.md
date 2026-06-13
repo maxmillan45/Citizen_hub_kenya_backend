@@ -143,7 +143,7 @@ EOF
 
 
 ### Step 5: Run Migrations
-bash
+```bash
 python manage.py migrate
 
 ### Step 6: Create Superuser
