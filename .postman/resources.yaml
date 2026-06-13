@@ -1,0 +1,9 @@
+workspace:
+  id: b06d95a6-020e-4b78-9807-001452986234
+localResources:
+  collections:
+    - ..\Citizen_Hub_Kenya_Postman_Collection.json
+    - ../Citizen_Hub_Kenya_Postman_Collection.json
+cloudResources:
+  collections:
+    ../Citizen_Hub_Kenya_Postman_Collection.json: 53511257-2844ba2c-eacb-442c-8151-20d6cc7eda72
