@@ -11,3 +11,4 @@ requests==2.32.3
 setuptools==69.5.1
 psycopg==3.2.6
 drf-yasg
+django-filter==25.1
