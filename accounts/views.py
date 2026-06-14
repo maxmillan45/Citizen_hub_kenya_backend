@@ -104,3 +104,46 @@ class ForgotPasswordView(APIView):
             return Response({'message': 'Password reset link sent'})
         except User.DoesNotExist:
             return Response({'message': 'If account exists, reset link sent'}, status=status.HTTP_200_OK)
+from rest_framework_simplejwt.tokens import RefreshToken
+
+class MPesaAuthenticateView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request):
+        checkout_request_id = request.data.get('checkout_request_id')
+        phone_number = request.data.get('phone_number')
+        
+        if not checkout_request_id:
+            return Response({'error': 'CheckoutRequestID required'}, status=400)
+        
+        # Verify payment status
+        from accounts.mpesa_views import QueryStatusView
+        status_view = QueryStatusView()
+        response = status_view.get(request, checkout_request_id)
+        
+        if response.status_code != 200:
+            return Response({'error': 'Payment verification failed'}, status=400)
+        
+        result = response.data
+        if result.get('ResultCode') == '0':
+            # Payment successful - create or get user
+            user, created = User.objects.get_or_create(
+                phone_number=phone_number,
+                defaults={'username': phone_number}
+            )
+            
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'success': True,
+                'access_token': str(refresh.access_token),
+                'refresh_token': str(refresh),
+                'user_id': user.id,
+                'is_new_user': created,
+                'phone_number': user.phone_number
+            })
+        else:
+            return Response({
+                'success': False,
+                'message': result.get('ResultDesc', 'Payment not completed')
+            }, status=400)

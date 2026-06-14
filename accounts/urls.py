@@ -46,3 +46,13 @@ urlpatterns += [
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
 ]
+from .mpesa_views import QueryStatusView
+
+urlpatterns += [
+    path('stk/status/<str:checkout_request_id>/', QueryStatusView.as_view(), name='stk-status'),
+]
+from .views import MPesaAuthenticateView
+
+urlpatterns += [
+    path('mpesa/authenticate/', MPesaAuthenticateView.as_view(), name='mpesa-authenticate'),
+]
