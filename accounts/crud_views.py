@@ -9,7 +9,7 @@ import csv
 class FAQDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = FAQ.objects.all()
     serializer_class = FAQSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
     
     def delete(self, request, *args, **kwargs):
         faq = self.get_object()
@@ -22,10 +22,10 @@ class FAQDetailView(generics.RetrieveUpdateDestroyAPIView):
 class MPDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = MP.objects.all()
     serializer_class = MPSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]  # Changed to public
 
 class BulkFAQDeleteView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request):
         ids = request.data.get('ids', [])
@@ -41,7 +41,7 @@ class BulkFAQDeleteView(APIView):
         })
 
 class ExportCrimeReportsView(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
     
     def get(self, request):
         reports = CrimeReport.objects.all()
@@ -57,3 +57,17 @@ class ExportCrimeReportsView(APIView):
                            report.location, report.status, report.created_at])
         
         return response
+from .models import PublicEvent
+from .serializers import PublicEventSerializer
+
+class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PublicEvent.objects.all()
+    serializer_class = PublicEventSerializer
+    permission_classes = [permissions.AllowAny]
+from .models import PublicEvent
+from .serializers import PublicEventSerializer
+
+class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = PublicEvent.objects.all()
+    serializer_class = PublicEventSerializer
+    permission_classes = [permissions.AllowAny]

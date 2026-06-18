@@ -1,9 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import (
-    DidYouKnowFact, FAQ, MP, PublicEvent, CrimeReport, 
-    VotingRecord, MPPerformance, EventAttendance, MpesaTransaction
-)
+from .models import DidYouKnowFact, FAQ, MP, PublicEvent, CrimeReport, VotingRecord
 
 User = get_user_model()
 
@@ -11,7 +8,6 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'phone_number', 'email', 'civic_score', 'account_type', 'language', 'is_id_verified', 'date_joined']
-        read_only_fields = ['id', 'civic_score', 'date_joined']
 
 class DidYouKnowFactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -22,55 +18,26 @@ class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
         fields = ['id', 'question', 'answer', 'category', 'views', 'helpful_count', 'not_helpful_count', 'created_at']
-        read_only_fields = ['id', 'views', 'helpful_count', 'not_helpful_count', 'created_at']
-
-    def validate_question(self, value):
-        if len(value) < 10:
-            raise serializers.ValidationError("Question too short (minimum 10 characters)")
-        return value
 
 class MPSerializer(serializers.ModelSerializer):
     class Meta:
         model = MP
-        fields = ['id', 'name', 'constituency', 'party', 'term_start', 'term_end', 'photo_url', 'contact_phone', 'contact_email']
-        read_only_fields = ['id']
+        fields = ['id', 'name', 'constituency', 'party']
 
 class PublicEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = PublicEvent
-        fields = ['id', 'title', 'description', 'date', 'location', 'category', 'organizer', 'is_free', 'fee_amount', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = '__all__'
 
 class CrimeReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrimeReport
-        fields = ['id', 'category', 'description', 'location', 'status', 'reported_by', 'created_at', 'updated_at']
+        fields = ['id', 'category', 'description', 'location', 'status', 'created_at', 'updated_at']
         read_only_fields = ['id', 'status', 'created_at', 'updated_at']
-
-    def validate_description(self, value):
-        if len(value) < 20:
-            raise serializers.ValidationError("Description too short (minimum 20 characters)")
-        return value
 
 class VotingRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = VotingRecord
-        fields = ['id', 'user', 'election_type', 'voted_at', 'status']
-        read_only_fields = ['id', 'voted_at']
-
-class MPPerformanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MPPerformance
-        fields = '__all__'
-
-class EventAttendanceSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EventAttendance
-        fields = '__all__'
-
-class MpesaTransactionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MpesaTransaction
         fields = '__all__'
 
 class RegisterSerializer(serializers.ModelSerializer):

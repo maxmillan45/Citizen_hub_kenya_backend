@@ -21,3 +21,23 @@ from .health_views import HealthCheckView
 
 # Add to urlpatterns:
 # path('health/', HealthCheckView.as_view(), name='health-check'),
+from rest_framework_simplejwt.views import TokenRefreshView
+
+urlpatterns += [
+    path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+]
+from accounts.simple_token import generate_token
+
+urlpatterns += [
+    path('api/token/', generate_token, name='generate_token'),
+]
+from accounts.token_view import get_access_token
+
+urlpatterns += [
+    path('api/get-token/', get_access_token, name='get_token'),
+]
+from accounts.token_view import get_access_token
+
+urlpatterns += [
+    path('api/get-token/', get_access_token, name='get_token'),
+]
