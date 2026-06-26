@@ -15,6 +15,7 @@ class MPesaAuth:
         consumer_secret = settings.MPESA_CONSUMER_SECRET
         
         if not consumer_key or not consumer_secret:
+            print("M-Pesa credentials missing")
             return None
         
         auth_string = f"{consumer_key}:{consumer_secret}"
@@ -25,11 +26,18 @@ class MPesaAuth:
         url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
         
         try:
+            print("Requesting M-Pesa access token...")
             response = requests.get(url, headers=headers, timeout=30)
-            response.raise_for_status()
-            return response.json().get('access_token')
+            print(f"Token response status: {response.status_code}")
+            if response.status_code == 200:
+                token = response.json().get('access_token')
+                print(f"Token received: {token[:20]}...")
+                return token
+            else:
+                print(f"Token error: {response.text}")
+                return None
         except Exception as e:
-            print(f"Auth error: {e}")
+            print(f"Token request error: {e}")
             return None
 
 class RequestSTKPushView(APIView):
@@ -42,21 +50,33 @@ class RequestSTKPushView(APIView):
             account_reference = request.data.get('account_reference', 'CitizenHub')
             transaction_desc = request.data.get('transaction_desc', 'Payment')
             
+            print(f"STK Push request - Phone: {phone_number}, Amount: {amount}")
+            
             if not phone_number:
                 return Response({'error': 'Phone number required'}, status=status.HTTP_400_BAD_REQUEST)
             
+            # Format phone number
             if phone_number.startswith('0'):
                 phone_number = '254' + phone_number[1:]
             elif phone_number.startswith('+'):
                 phone_number = phone_number[1:]
             
+            print(f"Formatted phone: {phone_number}")
+            
             access_token = MPesaAuth.get_access_token()
             if not access_token:
-                return Response({'error': 'Failed to authenticate with M-Pesa'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({
+                    'error': 'Failed to authenticate with M-Pesa. Check your credentials.'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             passkey = settings.MPESA_PASSKEY
             shortcode = settings.MPESA_SHORTCODE
+            
+            if not passkey or not shortcode:
+                return Response({
+                    'error': 'M-Pesa shortcode or passkey not configured'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             password_str = f"{shortcode}{passkey}{timestamp}"
             password_bytes = password_str.encode('ascii')
@@ -76,20 +96,33 @@ class RequestSTKPushView(APIView):
                 'PartyA': phone_number,
                 'PartyB': shortcode,
                 'PhoneNumber': phone_number,
-                'CallBackURL': settings.MPESA_CALLBACK_URL,
+                'CallBackURL': settings.MPESA_CALLBACK_URL or 'https://citizen-hub-kenya-backend.onrender.com/api/auth/stk/callback/',
                 'AccountReference': account_reference,
                 'TransactionDesc': transaction_desc
             }
+            
+            print(f"STK Push payload: {json.dumps(payload, indent=2)}")
             
             url = 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
             
             response = requests.post(url, json=payload, headers=headers, timeout=30)
             response_data = response.json()
             
+            print(f"STK Push response: {json.dumps(response_data, indent=2)}")
+            
             return Response(response_data, status=status.HTTP_200_OK)
             
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {e}")
+            return Response({
+                'error': f'Network error: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            import traceback
+            print(traceback.format_exc())
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class MPesaCallbackView(APIView):
     permission_classes = [AllowAny]
@@ -100,16 +133,21 @@ class MPesaCallbackView(APIView):
             print("Callback received:", json.dumps(callback_data, indent=2))
             return Response({'ResultCode': 0, 'ResultDesc': 'Success'}, status=status.HTTP_200_OK)
         except Exception as e:
+            print(f"Callback error: {e}")
             return Response({'ResultCode': 1, 'ResultDesc': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class QueryStatusView(APIView):
-    permission_classes = [AllowAny]  # Temporarily allow anyone to check status
+    permission_classes = [AllowAny]
     
     def get(self, request, checkout_request_id):
         try:
+            print(f"Querying status for: {checkout_request_id}")
+            
             access_token = MPesaAuth.get_access_token()
             if not access_token:
-                return Response({'error': 'Failed to authenticate'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                return Response({
+                    'error': 'Failed to authenticate with M-Pesa'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
             shortcode = settings.MPESA_SHORTCODE
@@ -134,10 +172,18 @@ class QueryStatusView(APIView):
             url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
             
             response = requests.post(url, json=payload, headers=headers, timeout=30)
-            return Response(response.json(), status=status.HTTP_200_OK)
+            response_data = response.json()
+            
+            print(f"Status response: {json.dumps(response_data, indent=2)}")
+            
+            return Response(response_data, status=status.HTTP_200_OK)
             
         except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            import traceback
+            print(traceback.format_exc())
+            return Response({
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class TestAuthSuccessView(APIView):
     permission_classes = [AllowAny]
