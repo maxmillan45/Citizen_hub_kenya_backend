@@ -1,179 +1,25 @@
-from rest_framework import status, permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate, get_user_model
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, ChangePasswordSerializer
-import requests
-import base64
-from datetime import datetime
-from django.conf import settings
-
-User = get_user_model()
-
-class RegisterView(APIView):
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
-        if serializer.is_valid():
-            try:
-                user = serializer.save()
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'user': UserSerializer(user).data,
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                }, status=status.HTTP_201_CREATED)
-            except Exception as e:
-                return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class LoginView(APIView):
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        serializer = LoginSerializer(data=request.data)
-        if serializer.is_valid():
-            user = authenticate(
-                request,
-                username=serializer.validated_data.get('phone_number'),
-                password=serializer.validated_data.get('password')
-            )
-            if user:
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'user': UserSerializer(user).data,
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                })
-            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-        serializer = UserSerializer(request.user)
-        return Response(serializer.data)
-    
-    def patch(self, request):
-        serializer = UserSerializer(request.user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        try:
-            refresh_token = request.data.get('refresh')
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response({'message': 'Logged out successfully'})
-        except Exception:
-            return Response({'message': 'Logged out'}, status=status.HTTP_200_OK)
-
-class ChangePasswordView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        serializer = ChangePasswordSerializer(data=request.data)
-        if serializer.is_valid():
-            user = request.user
-            if not user.check_password(serializer.validated_data['old_password']):
-                return Response({'error': 'Wrong password'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({'message': 'Password changed successfully'})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        phone_number = request.data.get('phone_number')
-        try:
-            user = User.objects.get(phone_number=phone_number)
-            return Response({'message': 'Password reset link sent'})
-        except User.DoesNotExist:
-            return Response({'message': 'If account exists, reset link sent'}, status=status.HTTP_200_OK)
-
-class TestAuthSuccessView(APIView):
-    permission_classes = [AllowAny]
-    
-    def post(self, request):
-        return Response({"message": "Test auth success", "status": "ok"})
-
+# Add or update this view in your accounts/views.py
 class CompleteProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
         user = request.user
+        user.first_name = request.data.get('first_name', user.first_name)
+        user.last_name = request.data.get('last_name', user.last_name)
         user.email = request.data.get('email', user.email)
-        user.full_name = request.data.get('full_name', getattr(user, 'full_name', ''))
-        user.language = request.data.get('language', 'en')
+        user.language = request.data.get('language', user.language)
         user.save()
         
         return Response({
             'message': 'Profile completed successfully',
-            'user': UserSerializer(user).data
+            'user': {
+                'id': user.id,
+                'phone_number': user.phone_number,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'email': user.email,
+                'language': user.language,
+                'civic_score': user.civic_score,
+                'account_type': user.account_type
+            }
         })
-
-class MPesaAuthenticateView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        checkout_request_id = request.data.get('checkout_request_id')
-        phone_number = request.data.get('phone_number')
-
-        if not checkout_request_id:
-            return Response({'error': 'CheckoutRequestID required'}, status=400)
-
-        # Format phone number
-        if phone_number and phone_number.startswith('0'):
-            phone_number = '254' + phone_number[1:]
-        elif phone_number and phone_number.startswith('+'):
-            phone_number = phone_number[1:]
-
-        # Query transaction status
-        from accounts.mpesa_views import QueryStatusView
-        status_view = QueryStatusView()
-
-        response = status_view.get(request, checkout_request_id)
-
-        if response.status_code != 200:
-            return Response({'success': False, 'message': 'Payment verification failed'}, status=400)
-
-        result = response.data
-
-        if result.get('ResultCode') == '0':
-            # Payment successful - create or get user
-            user, created = User.objects.get_or_create(
-                phone_number=phone_number,
-                defaults={
-                    'username': phone_number,
-                    'phone_number': phone_number
-                }
-            )
-
-            refresh = RefreshToken.for_user(user)
-
-            return Response({
-                'success': True,
-                'access_token': str(refresh.access_token),
-                'refresh_token': str(refresh),
-                'user_id': user.id,
-                'is_new_user': created,
-                'phone_number': user.phone_number
-            })
-        else:
-            return Response({
-                'success': False,
-                'message': result.get('ResultDesc', 'Payment not completed'),
-                'result_code': result.get('ResultCode')
-            }, status=400)
