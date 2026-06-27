@@ -26,11 +26,11 @@ class MPesaWaitPaymentView(APIView):
         elif phone_number and phone_number.startswith('+'):
             phone_number = phone_number[1:]
         
-        # Poll for 60 seconds (12 attempts * 5 seconds)
-        for attempt in range(12):
-            time.sleep(5)
+        # Poll for 60 seconds but with longer intervals to avoid rate limits
+        # 6 attempts * 10 seconds = 60 seconds
+        for attempt in range(6):
+            time.sleep(10)
             
-            # Get access token
             consumer_key = settings.MPESA_CONSUMER_KEY
             consumer_secret = settings.MPESA_CONSUMER_SECRET
             
