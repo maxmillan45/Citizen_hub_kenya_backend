@@ -57,3 +57,8 @@ from .direct_token import get_token_direct
 urlpatterns += [
     path('get-token/', get_token_direct, name='get-token-direct'),
 ]
+from .mpesa_wait import MPesaWaitPaymentView
+
+urlpatterns += [
+    path('stk/wait/', MPesaWaitPaymentView.as_view(), name='stk-wait'),
+]
