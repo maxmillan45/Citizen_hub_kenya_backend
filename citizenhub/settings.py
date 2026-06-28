@@ -12,6 +12,8 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     'citizen-hub-kenya-backend.onrender.com',
+    'citizen-hub-frontend.onrender.com',
+    'citizen-hub-admin.onrender.com',
     '.onrender.com',
 ]
 
@@ -89,7 +91,7 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
-# CORS Configuration - Allow your frontend domains
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -98,6 +100,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://localhost:8000',
     'https://citizen-hub-kenya-backend.onrender.com',
     'https://citizen-hub-frontend.onrender.com',
+    'https://citizen-hub-admin.onrender.com',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
