@@ -11,9 +11,8 @@ DEBUG = os.getenv('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
-    'citizen-hub-backend.onrender.com',
     'citizen-hub-kenya-backend.onrender.com',
-    '.onrender.com',  # This allows all Render subdomains
+    '.onrender.com',
 ]
 
 INSTALLED_APPS = [
@@ -90,12 +89,39 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
+# CORS Configuration - Add your frontend URLs here
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
     'http://localhost:8000',
     'https://citizen-hub-kenya-backend.onrender.com',
+    'https://your-frontend-url.onrender.com',  # Add your frontend Render URL
 ]
+
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -129,7 +155,7 @@ MPESA_CONSUMER_KEY = os.getenv('MPESA_CONSUMER_KEY', '')
 MPESA_CONSUMER_SECRET = os.getenv('MPESA_CONSUMER_SECRET', '')
 MPESA_PASSKEY = os.getenv('MPESA_PASSKEY', '')
 MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
-MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', 'https://citizen-hub-kenya-backend.onrender.com/api/auth/callback/')
+MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', 'https://citizen-hub-kenya-backend.onrender.com/api/auth/stk/callback/')
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
