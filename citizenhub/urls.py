@@ -27,3 +27,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+from accounts.make_superuser_endpoint import make_superuser
+
+urlpatterns += [
+    path('api/make-superuser/', make_superuser, name='make_superuser'),
+]
