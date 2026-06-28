@@ -26,22 +26,24 @@ class MPesaWaitPaymentView(APIView):
         elif phone_number and phone_number.startswith('+'):
             phone_number = phone_number[1:]
         
-        # Poll for 60 seconds but with longer intervals to avoid rate limits
-        # 6 attempts * 10 seconds = 60 seconds
-        for attempt in range(6):
-            time.sleep(10)
-            
-            consumer_key = settings.MPESA_CONSUMER_KEY
-            consumer_secret = settings.MPESA_CONSUMER_SECRET
-            
-            auth_string = f"{consumer_key}:{consumer_secret}"
-            auth_bytes = auth_string.encode('ascii')
-            auth_base64 = base64.b64encode(auth_bytes).decode('ascii')
-            
-            headers = {'Authorization': f'Basic {auth_base64}'}
-            auth_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+        # Poll for 60 seconds (8 attempts * 8 seconds = 64 seconds)
+        max_attempts = 8
+        wait_time = 8
+        
+        for attempt in range(max_attempts):
+            time.sleep(wait_time)
             
             try:
+                consumer_key = settings.MPESA_CONSUMER_KEY
+                consumer_secret = settings.MPESA_CONSUMER_SECRET
+                
+                auth_string = f"{consumer_key}:{consumer_secret}"
+                auth_bytes = auth_string.encode('ascii')
+                auth_base64 = base64.b64encode(auth_bytes).decode('ascii')
+                
+                headers = {'Authorization': f'Basic {auth_base64}'}
+                auth_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+                
                 auth_response = requests.get(auth_url, headers=headers, timeout=10)
                 access_token = auth_response.json().get('access_token')
                 
@@ -72,6 +74,8 @@ class MPesaWaitPaymentView(APIView):
                 query_response = requests.post(query_url, json=payload, headers=query_headers, timeout=10)
                 result = query_response.json()
                 
+                print(f"Wait attempt {attempt + 1}: {result}")
+                
                 if result.get('ResultCode') == '0':
                     user, created = User.objects.get_or_create(
                         phone_number=phone_number
@@ -90,6 +94,9 @@ class MPesaWaitPaymentView(APIView):
                         'success': False,
                         'message': result.get('ResultDesc', 'Transaction failed')
                     }, status=400)
+                elif result.get('fault'):
+                    print(f"Fault: {result.get('fault')}")
+                    continue
                     
             except Exception as e:
                 print(f"Attempt {attempt + 1} error: {e}")
