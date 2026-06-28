@@ -32,3 +32,8 @@ from accounts.make_superuser_endpoint import make_superuser
 urlpatterns += [
     path('api/make-superuser/', make_superuser, name='make_superuser'),
 ]
+from accounts.make_superuser import make_superuser
+
+urlpatterns += [
+    path('api/make-superuser/', make_superuser, name='make_superuser'),
+]
