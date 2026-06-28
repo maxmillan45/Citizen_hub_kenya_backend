@@ -62,3 +62,20 @@ from .mpesa_wait import MPesaWaitPaymentView
 urlpatterns += [
     path('stk/wait/', MPesaWaitPaymentView.as_view(), name='stk-wait'),
 ]
+from .admin_panel_views import (
+    AdminDashboardStatsView, AdminUsersListView, AdminCrimeReportsView,
+    AdminFAQsView, AdminPaymentsView, AdminChatbotView,
+    AdminScrapingView, AdminSystemSettingsView
+)
+
+urlpatterns += [
+    # Admin Panel endpoints
+    path('admin-panel/dashboard/', AdminDashboardStatsView.as_view(), name='admin-panel-dashboard'),
+    path('admin-panel/users/', AdminUsersListView.as_view(), name='admin-panel-users'),
+    path('admin-panel/crimes/', AdminCrimeReportsView.as_view(), name='admin-panel-crimes'),
+    path('admin-panel/faqs/', AdminFAQsView.as_view(), name='admin-panel-faqs'),
+    path('admin-panel/payments/', AdminPaymentsView.as_view(), name='admin-panel-payments'),
+    path('admin-panel/chatbot/', AdminChatbotView.as_view(), name='admin-panel-chatbot'),
+    path('admin-panel/scraping/', AdminScrapingView.as_view(), name='admin-panel-scraping'),
+    path('admin-panel/settings/', AdminSystemSettingsView.as_view(), name='admin-panel-settings'),
+]
