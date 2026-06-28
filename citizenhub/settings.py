@@ -89,7 +89,7 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
-# CORS Configuration - Add your frontend URLs here
+# CORS Configuration - Allow your frontend domains
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -97,7 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:8000',
     'https://citizen-hub-kenya-backend.onrender.com',
-    'https://your-frontend-url.onrender.com',  # Add your frontend Render URL
+    'https://citizen-hub-frontend.onrender.com',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
