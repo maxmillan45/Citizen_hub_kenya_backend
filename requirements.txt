@@ -12,3 +12,4 @@ requests==2.32.3
 beautifulsoup4==4.12.3
 lxml==5.2.2
 openai==1.35.1
+setuptools==70.0.0
