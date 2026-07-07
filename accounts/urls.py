@@ -79,3 +79,8 @@ urlpatterns += [
     path('admin-panel/scraping/', AdminScrapingView.as_view(), name='admin-panel-scraping'),
     path('admin-panel/settings/', AdminSystemSettingsView.as_view(), name='admin-panel-settings'),
 ]
+from .wait_for_payment import WaitForPaymentView
+
+urlpatterns += [
+    path('stk/wait/', WaitForPaymentView.as_view(), name='stk-wait'),
+]
