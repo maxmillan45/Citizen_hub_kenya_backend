@@ -1,55 +1,75 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
-from constitution.models import Article
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import generics, status
+from django.conf import settings
 from .models import Conversation
 from .serializers import ConversationSerializer
+from constitution.models import Article
+import openai
+import re
 
 class AskChatbotView(APIView):
     permission_classes = [IsAuthenticated]
-
+    
     def post(self, request):
-        question = request.data.get('question', '')
+        question = request.data.get('question')
         language = request.data.get('language', 'en')
         
         if not question:
             return Response({'error': 'Question is required'}, status=status.HTTP_400_BAD_REQUEST)
         
-        # Build search query from question
-        q_lower = question.lower()
-        
-        # Create broader search conditions
-        search_conditions = Q()
-        
-        # Chapter questions
-        if "chapter" in q_lower or "chapters" in q_lower or "structure" in q_lower:
-            # Return all chapter info
-            chapters_article = """
-            The Constitution of Kenya 2010 has 18 Chapters:
+        try:
+            # Try to use OpenAI first
+            openai_api_key = settings.OPENAI_API_KEY
             
-            Chapter 1: Sovereignty of the People and Supremacy of this Constitution (Articles 1-4)
-            Chapter 2: The Republic (Articles 5-10)
-            Chapter 3: Citizenship (Articles 11-18)
-            Chapter 4: The Bill of Rights (Articles 19-59)
-            Chapter 5: Land and Environment (Articles 60-68)
-            Chapter 6: Leadership and Integrity (Articles 73-80)
-            Chapter 7: Representation of the People (Articles 81-100)
-            Chapter 8: The Legislature (Articles 93-122)
-            Chapter 9: The Executive (Articles 129-155)
-            Chapter 10: The Judiciary (Articles 159-173)
-            Chapter 11: Devolved Government (Articles 174-190)
-            Chapter 12: Public Finance (Articles 201-222)
-            Chapter 13: The Public Service (Articles 232-239)
-            Chapter 14: National Security (Articles 238-247)
-            Chapter 15: Commissions and Independent Offices (Articles 248-254)
-            Chapter 16: Amendment of this Constitution (Articles 255-257)
-            Chapter 17: General Provisions (Articles 258-263)
-            Chapter 18: Transitional and Consequential Provisions (Articles 262-264)
-            """
-            answer = chapters_article
-            sources = ["Constitution of Kenya 2010 - Full Document"]
+            if openai_api_key:
+                try:
+                    client = openai.OpenAI(api_key=openai_api_key)
+                    response = client.chat.completions.create(
+                        model="gpt-3.5-turbo",
+                        messages=[
+                            {"role": "system", "content": f"You are a legal assistant specializing in the Constitution of Kenya. Answer questions about Kenyan law, rights, and governance. Respond in {'Swahili' if language == 'sw' else 'English'}."},
+                            {"role": "user", "content": question}
+                        ],
+                        max_tokens=500,
+                        temperature=0.7
+                    )
+                    answer = response.choices[0].message.content
+                    sources = []
+                    
+                    # Try to find relevant articles
+                    articles = Article.objects.filter(
+                        full_text__icontains=question
+                    )[:3]
+                    sources = [article.article_number for article in articles]
+                    
+                except Exception as e:
+                    print(f"OpenAI error: {e}")
+                    # Fallback to local search
+                    answer = self._generate_fallback_response(question, language)
+                    articles = Article.objects.filter(
+                        full_text__icontains=question
+                    )[:3]
+                    sources = [article.article_number for article in articles]
+            else:
+                # No OpenAI key, use fallback
+                answer = self._generate_fallback_response(question, language)
+                articles = Article.objects.filter(
+                    full_text__icontains=question
+                )[:3]
+                sources = [article.article_number for article in articles]
+            
+            # If no articles found, search by keywords
+            if not sources:
+                keywords = self._extract_keywords(question)
+                for keyword in keywords:
+                    articles = Article.objects.filter(
+                        full_text__icontains=keyword
+                    )[:3]
+                    if articles:
+                        sources = [article.article_number for article in articles]
+                        break
             
             # Save conversation
             conversation = Conversation.objects.create(
@@ -61,196 +81,82 @@ class AskChatbotView(APIView):
             )
             
             return Response({
+                'question': question,
                 'answer': answer,
                 'sources': sources,
                 'conversation_id': conversation.id
             })
-        
-        # General constitution questions
-        if "what is the constitution" in q_lower or "about the constitution" in q_lower or "tell me about constitution" in q_lower:
-            answer = """
-            The Constitution of Kenya 2010 is the supreme law of Kenya. It was promulgated on August 27, 2010.
             
-            Key features include:
-            - Bill of Rights (Chapter 4) protecting fundamental freedoms
-            - Devolution creating 47 county governments
-            - Separation of powers between Executive, Legislature, and Judiciary
-            - Independent commissions and offices
-            - Land and environment provisions
-            - Leadership and integrity requirements for public officers
-            
-            It transformed Kenya's governance structure and expanded citizen participation in democracy.
-            """
-            sources = ["Constitution of Kenya 2010 - Preamble and Overview"]
-            
-            conversation = Conversation.objects.create(
-                user=request.user,
-                question=question,
-                answer=answer,
-                language=language,
-                sources=sources
-            )
-            
+        except Exception as e:
+            print(f"Chatbot error: {e}")
             return Response({
-                'answer': answer,
-                'sources': sources,
-                'conversation_id': conversation.id
-            })
+                'error': 'Sorry, I could not process your question. Please try again.'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def _extract_keywords(self, question):
+        # Extract keywords from question
+        question_lower = question.lower()
+        keywords = []
         
-        # Rights questions
-        if "rights" in q_lower or "fundamental rights" in q_lower or "bill of rights" in q_lower:
-            if "what are my rights" in q_lower or "list of rights" in q_lower:
-                answer = """
-                The Bill of Rights (Chapter 4, Articles 19-59) guarantees these fundamental rights:
-                
-                Article 26: Right to life
-                Article 27: Equality and freedom from discrimination
-                Article 28: Human dignity
-                Article 29: Freedom and security of the person
-                Article 30: Freedom from slavery and forced labor
-                Article 31: Privacy
-                Article 32: Freedom of conscience, religion, belief and opinion
-                Article 33: Freedom of expression
-                Article 34: Freedom of the media
-                Article 35: Access to information
-                Article 36: Freedom of association
-                Article 37: Assembly, demonstration, picketing and petition
-                Article 38: Political rights
-                Article 39: Freedom of movement and residence
-                Article 40: Protection of right to property
-                Article 41: Labor relations
-                Article 42: Clean and healthy environment
-                Article 43: Economic and social rights (education, health, housing)
-                Article 44: Cultural rights
-                Article 45: Family rights
-                Article 46: Consumer rights
-                Article 47: Fair administrative action
-                Article 48: Access to justice
-                Article 49: Rights of arrested persons
-                Article 50: Fair hearing
-                """
-                sources = ["Articles 26-50, Constitution of Kenya 2010"]
-                
-                conversation = Conversation.objects.create(
-                    user=request.user,
-                    question=question,
-                    answer=answer,
-                    language=language,
-                    sources=sources
-                )
-                
-                return Response({
-                    'answer': answer,
-                    'sources': sources,
-                    'conversation_id': conversation.id
-                })
+        # Common legal keywords
+        legal_terms = [
+            'right', 'rights', 'arrest', 'police', 'land', 'property', 'employment',
+            'health', 'education', 'family', 'voting', 'corruption', 'privacy',
+            'dignity', 'equality', 'discrimination', 'life', 'security', 'freedom',
+            'speech', 'assembly', 'religion', 'movement', 'information', 'justice'
+        ]
         
-        # Specific keyword searches
-        if "arrest" in q_lower or "police arrest" in q_lower or "criminal" in q_lower:
-            search_conditions |= Q(article_number='49')
-            search_conditions |= Q(title__icontains='arrest')
+        for term in legal_terms:
+            if term in question_lower:
+                keywords.append(term)
         
-        if "privacy" in q_lower or "phone" in q_lower or "search my phone" in q_lower:
-            search_conditions |= Q(article_number='31')
-            search_conditions |= Q(title__icontains='privacy')
+        # If no keywords found, use the whole question
+        if not keywords:
+            keywords = [question_lower[:50]]
         
-        if "land" in q_lower or "property" in q_lower or "house" in q_lower:
-            search_conditions |= Q(article_number='40')
-            search_conditions |= Q(title__icontains='property')
+        return keywords
+    
+    def _generate_fallback_response(self, question, language):
+        # Search for relevant articles
+        articles = Article.objects.filter(
+            full_text__icontains=question
+        )[:5]
         
-        if "health" in q_lower or "hospital" in q_lower:
-            search_conditions |= Q(article_number='43')
-            search_conditions |= Q(title__icontains='health')
-        
-        if "education" in q_lower or "school" in q_lower:
-            search_conditions |= Q(article_number='43')
-            search_conditions |= Q(title__icontains='education')
-        
-        if "discrimination" in q_lower or "equal" in q_lower:
-            search_conditions |= Q(article_number='27')
-            search_conditions |= Q(title__icontains='discrimination')
-        
-        if "torture" in q_lower or "cruel" in q_lower:
-            search_conditions |= Q(article_number='29')
-            search_conditions |= Q(title__icontains='torture')
-        
-        if "vote" in q_lower or "election" in q_lower or "political" in q_lower:
-            search_conditions |= Q(article_number='38')
-            search_conditions |= Q(title__icontains='political')
-        
-        if "expression" in q_lower or "speak" in q_lower or "opinion" in q_lower:
-            search_conditions |= Q(article_number='33')
-            search_conditions |= Q(title__icontains='expression')
-        
-        if "fair hearing" in q_lower or "court" in q_lower or "justice" in q_lower:
-            search_conditions |= Q(article_number='50')
-            search_conditions |= Q(title__icontains='hearing')
-        
-        if "life" in q_lower or "death penalty" in q_lower:
-            search_conditions |= Q(article_number='26')
-            search_conditions |= Q(title__icontains='life')
-        
-        # Also search by content
-        search_conditions |= Q(full_text__icontains=q_lower[:100])
-        search_conditions |= Q(simplified_english__icontains=q_lower[:100])
-        
-        articles = Article.objects.filter(search_conditions).distinct()[:5]
-        
-        sources = []
-        context = ""
-        
-        for article in articles:
-            context += f"Article {article.article_number}: {article.simplified_english}\n\n"
-            sources.append(article.article_number)
-        
-        if not sources and ("phone" in q_lower or "search" in q_lower):
-            # Force privacy article for phone search questions
-            try:
-                privacy_article = Article.objects.get(article_number='31')
-                context = f"Article 31: {privacy_article.simplified_english}\n\n"
-                sources = ["31"]
-            except Article.DoesNotExist:
-                pass
-        
-        if sources:
-            answer = f"Based on the Constitution of Kenya:\n\n{context}\n\nThis information is for educational purposes. Consult a lawyer for legal advice."
+        if articles:
+            sources = [a.article_number for a in articles]
+            if language == 'sw':
+                return f"Kulingana na Katiba ya Kenya, nimepata habari katika Kifungu {', '.join(sources)}. Hizi ndizo vifungu vinavyohusiana na swali lako. Tafadhali rejelea Katiba kwa maelezo kamili."
+            else:
+                return f"Based on the Constitution of Kenya, I found relevant information in Article(s) {', '.join(sources)}. These are the articles related to your question. Please refer to the constitution for complete details."
         else:
-            # Better fallback message
-            answer = f"I understand you're asking about '{question}'. To get the best answer, please try:\n\n1. Asking about specific rights (e.g., 'right to privacy')\n2. Mentioning specific articles (e.g., 'Article 31')\n3. Asking about topics like: arrest, privacy, land, health, education, voting, expression, or fair hearing\n\nFor general constitutional information, ask 'What are the chapters of the constitution?'"
-        
-        conversation = Conversation.objects.create(
-            user=request.user,
-            question=question,
-            answer=answer,
-            language=language,
-            sources=sources
-        )
-        
-        return Response({
-            'answer': answer,
-            'sources': sources,
-            'conversation_id': conversation.id
-        })
-
-class ConversationHistoryView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def get(self, request):
-        conversations = Conversation.objects.filter(user=request.user).order_by('-created_at')[:20]
-        serializer = ConversationSerializer(conversations, many=True)
-        return Response(serializer.data)
-
-class RateAnswerView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        conversation_id = request.data.get('conversation_id')
-        helpful = request.data.get('helpful')
-        
-        try:
-            conversation = Conversation.objects.get(id=conversation_id, user=request.user)
-            conversation.helpful = helpful
-            conversation.save()
-            return Response({'message': 'Thank you for your feedback'})
-        except Conversation.DoesNotExist:
-            return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+            # Search by topic
+            topics = {
+                'arrest': "Under the Constitution of Kenya, Article 49 provides rights for arrested persons including the right to remain silent, right to a lawyer, and right to be informed of the charges.",
+                'land': "Article 40 of the Constitution of Kenya protects the right to property. Article 67 establishes the National Land Commission.",
+                'employment': "Article 41 of the Constitution of Kenya protects labour rights including fair labour practices and the right to form trade unions.",
+                'health': "Article 43 of the Constitution of Kenya provides for economic and social rights including the right to health and healthcare services.",
+                'education': "Article 43 of the Constitution of Kenya provides for the right to education.",
+                'family': "Article 45 of the Constitution of Kenya recognizes the family as the natural and fundamental unit of society.",
+                'voting': "Article 38 of the Constitution of Kenya guarantees the right to participate in elections and to vote.",
+                'corruption': "Chapter Six of the Constitution of Kenya provides for leadership and integrity, including anti-corruption measures.",
+                'privacy': "Article 31 of the Constitution of Kenya protects the right to privacy.",
+                'dignity': "Article 28 of the Constitution of Kenya recognizes and protects human dignity.",
+                'equality': "Article 27 of the Constitution of Kenya guarantees equality and freedom from discrimination.",
+                'speech': "Article 33 of the Constitution of Kenya protects freedom of expression.",
+                'assembly': "Article 37 of the Constitution of Kenya protects the right to assemble and demonstrate.",
+                'religion': "Article 32 of the Constitution of Kenya protects freedom of religion and belief.",
+                'information': "Article 35 of the Constitution of Kenya guarantees the right to access information.",
+                'justice': "Article 48 of the Constitution of Kenya ensures access to justice for all persons."
+            }
+            
+            question_lower = question.lower()
+            for topic, response_text in topics.items():
+                if topic in question_lower:
+                    if language == 'sw':
+                        return f"Katiba ya Kenya inasema: {response_text}"
+                    return f"The Constitution of Kenya states: {response_text}"
+            
+            if language == 'sw':
+                return "Samahani, siwezi kujibu swali lako. Tafadhali uliza swali lako kwa njia tofauti au rejelea mhasibu wa sheria."
+            else:
+                return "I'm sorry, I cannot answer your question. Please rephrase your question or consult a legal professional."
