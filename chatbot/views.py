@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework import generics, status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
 from django.conf import settings
 from .models import Conversation
 from .serializers import ConversationSerializer
 from constitution.models import Article
 import openai
 import re
+import time
 
 class AskChatbotView(APIView):
     permission_classes = [IsAuthenticated]
@@ -20,56 +21,16 @@ class AskChatbotView(APIView):
             return Response({'error': 'Question is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            # Try to use OpenAI first
-            openai_api_key = settings.OPENAI_API_KEY
+            # Search for relevant articles first (fast)
+            articles = self._find_relevant_articles(question)
+            sources = [article.article_number for article in articles]
             
-            if openai_api_key:
-                try:
-                    client = openai.OpenAI(api_key=openai_api_key)
-                    response = client.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": f"You are a legal assistant specializing in the Constitution of Kenya. Answer questions about Kenyan law, rights, and governance. Respond in {'Swahili' if language == 'sw' else 'English'}."},
-                            {"role": "user", "content": question}
-                        ],
-                        max_tokens=500,
-                        temperature=0.7
-                    )
-                    answer = response.choices[0].message.content
-                    sources = []
-                    
-                    # Try to find relevant articles
-                    articles = Article.objects.filter(
-                        full_text__icontains=question
-                    )[:3]
-                    sources = [article.article_number for article in articles]
-                    
-                except Exception as e:
-                    print(f"OpenAI error: {e}")
-                    # Fallback to local search
-                    answer = self._generate_fallback_response(question, language)
-                    articles = Article.objects.filter(
-                        full_text__icontains=question
-                    )[:3]
-                    sources = [article.article_number for article in articles]
-            else:
-                # No OpenAI key, use fallback
-                answer = self._generate_fallback_response(question, language)
-                articles = Article.objects.filter(
-                    full_text__icontains=question
-                )[:3]
-                sources = [article.article_number for article in articles]
+            # Try to use OpenAI if available
+            answer = self._get_answer(question, language, articles)
             
-            # If no articles found, search by keywords
-            if not sources:
-                keywords = self._extract_keywords(question)
-                for keyword in keywords:
-                    articles = Article.objects.filter(
-                        full_text__icontains=keyword
-                    )[:3]
-                    if articles:
-                        sources = [article.article_number for article in articles]
-                        break
+            # If answer is None, use fallback
+            if answer is None:
+                answer = self._generate_fallback_response(question, language, articles)
             
             # Save conversation
             conversation = Conversation.objects.create(
@@ -89,39 +50,110 @@ class AskChatbotView(APIView):
             
         except Exception as e:
             print(f"Chatbot error: {e}")
+            import traceback
+            traceback.print_exc()
+            
+            # Return a helpful fallback response
+            fallback = self._get_fallback_answer(question, language)
             return Response({
-                'error': 'Sorry, I could not process your question. Please try again.'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+                'question': question,
+                'answer': fallback,
+                'sources': [],
+                'conversation_id': None
+            })
+    
+    def _find_relevant_articles(self, question):
+        # Try exact match first
+        articles = Article.objects.filter(full_text__icontains=question)[:3]
+        
+        if articles:
+            return articles
+        
+        # Try by keywords
+        keywords = self._extract_keywords(question)
+        for keyword in keywords:
+            articles = Article.objects.filter(full_text__icontains=keyword)[:3]
+            if articles:
+                return articles
+        
+        # Try by topic
+        topic = self._get_topic(question)
+        if topic:
+            articles = Article.objects.filter(topic=topic)[:3]
+            if articles:
+                return articles
+        
+        return []
     
     def _extract_keywords(self, question):
-        # Extract keywords from question
         question_lower = question.lower()
         keywords = []
-        
-        # Common legal keywords
         legal_terms = [
-            'right', 'rights', 'arrest', 'police', 'land', 'property', 'employment',
-            'health', 'education', 'family', 'voting', 'corruption', 'privacy',
-            'dignity', 'equality', 'discrimination', 'life', 'security', 'freedom',
-            'speech', 'assembly', 'religion', 'movement', 'information', 'justice'
+            'right', 'rights', 'arrest', 'police', 'land', 'property', 
+            'employment', 'health', 'education', 'family', 'voting', 
+            'corruption', 'privacy', 'dignity', 'equality', 'discrimination',
+            'life', 'security', 'freedom', 'speech', 'assembly', 'religion',
+            'movement', 'information', 'justice', 'court', 'judge', 'law'
         ]
-        
         for term in legal_terms:
             if term in question_lower:
                 keywords.append(term)
-        
-        # If no keywords found, use the whole question
-        if not keywords:
-            keywords = [question_lower[:50]]
-        
-        return keywords
+        return keywords[:3]
     
-    def _generate_fallback_response(self, question, language):
-        # Search for relevant articles
-        articles = Article.objects.filter(
-            full_text__icontains=question
-        )[:5]
-        
+    def _get_topic(self, question):
+        question_lower = question.lower()
+        topics = {
+            'rights': ['right', 'rights', 'freedom', 'dignity', 'equality'],
+            'land': ['land', 'property', 'environment'],
+            'government': ['president', 'parliament', 'cabinet', 'judiciary'],
+            'citizenship': ['citizen', 'citizenship', 'passport']
+        }
+        for topic, keywords in topics.items():
+            if any(kw in question_lower for kw in keywords):
+                return topic
+        return None
+    
+    def _get_answer(self, question, language, articles):
+        try:
+            openai_api_key = settings.OPENAI_API_KEY
+            if not openai_api_key:
+                return None
+            
+            # Build context from articles
+            context = ""
+            for article in articles:
+                context += f"Article {article.article_number}: {article.full_text[:500]}\n\n"
+            
+            if not context:
+                context = "The Constitution of Kenya"
+            
+            system_prompt = f"""You are a legal assistant specializing in the Constitution of Kenya. 
+            Answer the user's question based on the following context:
+            
+            {context}
+            
+            If the question is not answered by the context, say so clearly and suggest what the constitution says on related topics.
+            Respond in {'Swahili' if language == 'sw' else 'English'}.
+            Keep your response clear, concise, and helpful."""
+            
+            client = openai.OpenAI(api_key=openai_api_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": question}
+                ],
+                max_tokens=300,
+                temperature=0.7,
+                timeout=10
+            )
+            return response.choices[0].message.content
+            
+        except Exception as e:
+            print(f"OpenAI error: {e}")
+            return None
+    
+    def _generate_fallback_response(self, question, language, articles):
         if articles:
             sources = [a.article_number for a in articles]
             if language == 'sw':
@@ -129,34 +161,38 @@ class AskChatbotView(APIView):
             else:
                 return f"Based on the Constitution of Kenya, I found relevant information in Article(s) {', '.join(sources)}. These are the articles related to your question. Please refer to the constitution for complete details."
         else:
-            # Search by topic
-            topics = {
-                'arrest': "Under the Constitution of Kenya, Article 49 provides rights for arrested persons including the right to remain silent, right to a lawyer, and right to be informed of the charges.",
-                'land': "Article 40 of the Constitution of Kenya protects the right to property. Article 67 establishes the National Land Commission.",
-                'employment': "Article 41 of the Constitution of Kenya protects labour rights including fair labour practices and the right to form trade unions.",
-                'health': "Article 43 of the Constitution of Kenya provides for economic and social rights including the right to health and healthcare services.",
-                'education': "Article 43 of the Constitution of Kenya provides for the right to education.",
-                'family': "Article 45 of the Constitution of Kenya recognizes the family as the natural and fundamental unit of society.",
-                'voting': "Article 38 of the Constitution of Kenya guarantees the right to participate in elections and to vote.",
-                'corruption': "Chapter Six of the Constitution of Kenya provides for leadership and integrity, including anti-corruption measures.",
-                'privacy': "Article 31 of the Constitution of Kenya protects the right to privacy.",
-                'dignity': "Article 28 of the Constitution of Kenya recognizes and protects human dignity.",
-                'equality': "Article 27 of the Constitution of Kenya guarantees equality and freedom from discrimination.",
-                'speech': "Article 33 of the Constitution of Kenya protects freedom of expression.",
-                'assembly': "Article 37 of the Constitution of Kenya protects the right to assemble and demonstrate.",
-                'religion': "Article 32 of the Constitution of Kenya protects freedom of religion and belief.",
-                'information': "Article 35 of the Constitution of Kenya guarantees the right to access information.",
-                'justice': "Article 48 of the Constitution of Kenya ensures access to justice for all persons."
-            }
-            
-            question_lower = question.lower()
-            for topic, response_text in topics.items():
-                if topic in question_lower:
-                    if language == 'sw':
-                        return f"Katiba ya Kenya inasema: {response_text}"
-                    return f"The Constitution of Kenya states: {response_text}"
-            
-            if language == 'sw':
-                return "Samahani, siwezi kujibu swali lako. Tafadhali uliza swali lako kwa njia tofauti au rejelea mhasibu wa sheria."
-            else:
-                return "I'm sorry, I cannot answer your question. Please rephrase your question or consult a legal professional."
+            return self._get_fallback_answer(question, language)
+    
+    def _get_fallback_answer(self, question, language):
+        question_lower = question.lower()
+        
+        # Common legal topics
+        responses = {
+            'arrest': "Under the Constitution of Kenya, Article 49 provides rights for arrested persons including the right to remain silent, right to a lawyer, and right to be informed of the charges. Article 50 guarantees the right to a fair hearing.",
+            'land': "Article 40 of the Constitution of Kenya protects the right to property. Article 67 establishes the National Land Commission. The Constitution also provides for land reform and protection of land rights.",
+            'employment': "Article 41 of the Constitution of Kenya protects labour rights including fair labour practices, the right to form trade unions, and the right to strike.",
+            'health': "Article 43 of the Constitution of Kenya provides for economic and social rights including the right to health and healthcare services. The state must ensure access to healthcare for all.",
+            'education': "Article 43 of the Constitution of Kenya provides for the right to education. The state must ensure access to basic education for all children.",
+            'family': "Article 45 of the Constitution of Kenya recognizes the family as the natural and fundamental unit of society. It protects marriage and family rights.",
+            'voting': "Article 38 of the Constitution of Kenya guarantees the right to participate in elections and to vote. Every citizen has the right to free, fair and regular elections.",
+            'corruption': "Chapter Six of the Constitution of Kenya provides for leadership and integrity, including anti-corruption measures. The Ethics and Anti-Corruption Commission is established to fight corruption.",
+            'privacy': "Article 31 of the Constitution of Kenya protects the right to privacy, including privacy of the home, correspondence, and personal data.",
+            'dignity': "Article 28 of the Constitution of Kenya recognizes and protects human dignity. Every person has inherent dignity and the right to have that dignity respected.",
+            'equality': "Article 27 of the Constitution of Kenya guarantees equality and freedom from discrimination. The state must take measures to ensure equality.",
+            'speech': "Article 33 of the Constitution of Kenya protects freedom of expression, including freedom of the press and media.",
+            'assembly': "Article 37 of the Constitution of Kenya protects the right to assemble, demonstrate, picket, and present petitions to public authorities.",
+            'religion': "Article 32 of the Constitution of Kenya protects freedom of religion, belief, and conscience.",
+            'information': "Article 35 of the Constitution of Kenya guarantees the right to access information held by the state.",
+            'justice': "Article 48 of the Constitution of Kenya ensures access to justice for all persons. The state must ensure that justice is accessible to all.",
+        }
+        
+        for topic, response_text in responses.items():
+            if topic in question_lower:
+                if language == 'sw':
+                    return f"Katiba ya Kenya inasema: {response_text}"
+                return f"The Constitution of Kenya states: {response_text}"
+        
+        if language == 'sw':
+            return "Samahani, siwezi kujibu swali lako kwa uhakika. Tafadhali rejelea Katiba ya Kenya au wasiliana na mwanasheria kwa ushauri wa kisheria."
+        else:
+            return "I'm sorry, I cannot answer your question with certainty. Please refer to the Constitution of Kenya or consult a legal professional for legal advice."
