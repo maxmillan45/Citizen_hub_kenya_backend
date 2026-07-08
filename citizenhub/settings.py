@@ -94,7 +94,6 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
-# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -144,7 +143,6 @@ MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', 'https://citizen-hub-kenya-
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
-# Swagger settings
 SWAGGER_SETTINGS = {
     'SECURITY_DEFINITIONS': {
         'Bearer': {
@@ -155,13 +153,6 @@ SWAGGER_SETTINGS = {
     },
     'USE_SESSION_AUTH': False,
     'JSON_EDITOR': True,
-    'SUPPORTED_SUBMIT_METHODS': [
-        'get',
-        'post',
-        'put',
-        'delete',
-        'patch'
-    ],
 }
 
 LOGGING = {
@@ -169,12 +160,6 @@ LOGGING = {
     'disable_existing_loggers': False,
     'handlers': {
         'console': {'class': 'logging.StreamHandler'},
-        'file': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs', 'django.log'),
-            'maxBytes': 1024 * 1024 * 10,
-            'backupCount': 10,
-        },
     },
     'root': {
         'handlers': ['console'],

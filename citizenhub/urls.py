@@ -2,9 +2,6 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from accounts.get_token import get_token
-from accounts.simple_token import generate_token
-from accounts.token_view import get_access_token
-from accounts.views import RegisterView, LoginView
 from rest_framework_simplejwt.views import TokenRefreshView
 
 def home(request):
@@ -12,7 +9,7 @@ def home(request):
 
 urlpatterns = [
     path('', home, name='home'),
-    path('health/', include('citizenhub.health_views'), name='health'),
+    path('health/', include('citizenhub.health_urls')),
     path('admin/', admin.site.urls),
     
     # Authentication
@@ -23,7 +20,6 @@ urlpatterns = [
     # Apps
     path('api/constitution/', include('constitution.urls')),
     path('api/chatbot/', include('chatbot.urls')),
-    path('api/scraper/', include('scraper.urls')),
 ]
 
 # Add Swagger URLs
