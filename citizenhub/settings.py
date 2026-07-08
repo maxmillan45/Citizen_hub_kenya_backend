@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
+    'drf_yasg',
     'accounts',
     'constitution',
     'chatbot',
@@ -66,7 +67,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'citizenhub.wsgi.application'
 
-# Database Configuration - PostgreSQL
 DATABASES = {
     'default': dj_database_url.config(
         default=os.getenv('DATABASE_URL'),
@@ -94,6 +94,7 @@ STATICFILES_DIRS = []
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'http://localhost:3001',
@@ -142,6 +143,26 @@ MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', 'https://citizen-hub-kenya-backend.onrender.com/api/auth/stk/callback/')
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+
+# Swagger settings
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+    'USE_SESSION_AUTH': False,
+    'JSON_EDITOR': True,
+    'SUPPORTED_SUBMIT_METHODS': [
+        'get',
+        'post',
+        'put',
+        'delete',
+        'patch'
+    ],
+}
 
 LOGGING = {
     'version': 1,

@@ -2,15 +2,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.http import JsonResponse
 from accounts.get_token import get_token
+from accounts.simple_token import generate_token
+from accounts.token_view import get_access_token
+from accounts.views import RegisterView, LoginView
 from rest_framework_simplejwt.views import TokenRefreshView
-import citizenhub.health_views as health_views
 
 def home(request):
     return JsonResponse({'message': 'Citizen Hub API', 'status': 'running'})
 
 urlpatterns = [
     path('', home, name='home'),
-    path('health/', health_views.HealthCheckView.as_view(), name='health'),
+    path('health/', include('citizenhub.health_views'), name='health'),
     path('admin/', admin.site.urls),
     
     # Authentication
@@ -21,19 +23,15 @@ urlpatterns = [
     # Apps
     path('api/constitution/', include('constitution.urls')),
     path('api/chatbot/', include('chatbot.urls')),
+    path('api/scraper/', include('scraper.urls')),
 ]
 
+# Add Swagger URLs
+from .swagger_urls import urlpatterns as swagger_urlpatterns
+urlpatterns += swagger_urlpatterns
+
+# Static files
 from django.conf import settings
 from django.conf.urls.static import static
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-from accounts.make_superuser_endpoint import make_superuser
-
-urlpatterns += [
-    path('api/make-superuser/', make_superuser, name='make_superuser'),
-]
-from accounts.make_superuser import make_superuser
-
-urlpatterns += [
-    path('api/make-superuser/', make_superuser, name='make_superuser'),
-]
