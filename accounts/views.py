@@ -114,27 +114,36 @@ class CompleteProfileView(APIView):
     
     def post(self, request):
         user = request.user
+        
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
         email = request.data.get('email')
         language = request.data.get('language')
         
-        if first_name:
+        if first_name is not None:
             user.first_name = first_name
-        if last_name:
+        if last_name is not None:
             user.last_name = last_name
-        if email:
+        if email is not None:
             user.email = email
-        if language:
+        if language is not None:
             user.language = language
         
         user.save()
         
         return Response({
             'message': 'Profile completed successfully',
-            'user': UserSerializer(user).data
+            'user': {
+                'id': user.id,
+                'phone_number': user.phone_number,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'language': user.language,
+                'civic_score': user.civic_score,
+                'account_type': user.account_type
+            }
         })
-
 class MPesaAuthenticateView(APIView):
     permission_classes = [AllowAny]
     
