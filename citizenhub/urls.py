@@ -12,21 +12,13 @@ urlpatterns = [
     path('health/', include('citizenhub.health_urls')),
     path('admin/', admin.site.urls),
     
-    # Authentication
     path('api/get-token/', get_token, name='get_token'),
     path('api/auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/auth/', include('accounts.urls')),
-    
-    # Apps
     path('api/constitution/', include('constitution.urls')),
     path('api/chatbot/', include('chatbot.urls')),
 ]
 
-# Add Swagger URLs
-from .swagger_urls import urlpatterns as swagger_urlpatterns
-urlpatterns += swagger_urlpatterns
-
-# Static files
 from django.conf import settings
 from django.conf.urls.static import static
 if settings.DEBUG:

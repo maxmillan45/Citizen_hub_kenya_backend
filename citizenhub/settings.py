@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'django_filters',
-    'drf_yasg',
     'accounts',
     'constitution',
     'chatbot',
@@ -142,18 +141,6 @@ MPESA_SHORTCODE = os.getenv('MPESA_SHORTCODE', '174379')
 MPESA_CALLBACK_URL = os.getenv('MPESA_CALLBACK_URL', 'https://citizen-hub-kenya-backend.onrender.com/api/auth/stk/callback/')
 
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-
-SWAGGER_SETTINGS = {
-    'SECURITY_DEFINITIONS': {
-        'Bearer': {
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header'
-        }
-    },
-    'USE_SESSION_AUTH': False,
-    'JSON_EDITOR': True,
-}
 
 LOGGING = {
     'version': 1,
