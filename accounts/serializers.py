@@ -7,7 +7,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'phone_number', 'email', 'civic_score', 'account_type', 'language', 'is_id_verified', 'date_joined']
+        fields = ['id', 'phone_number', 'email', 'first_name', 'last_name', 'civic_score', 'account_type', 'language', 'is_id_verified', 'date_joined']
 
 class DidYouKnowFactSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,7 +33,6 @@ class CrimeReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = CrimeReport
         fields = ['id', 'category', 'description', 'location', 'status', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'status', 'created_at', 'updated_at']
 
 class VotingRecordSerializer(serializers.ModelSerializer):
     class Meta:

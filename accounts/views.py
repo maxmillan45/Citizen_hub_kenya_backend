@@ -113,29 +113,27 @@ class CompleteProfileView(APIView):
     permission_classes = [IsAuthenticated]
     
     def post(self, request):
-        try:
-            user = request.user
-            user.first_name = request.data.get('first_name', user.first_name)
-            user.last_name = request.data.get('last_name', user.last_name)
-            user.email = request.data.get('email', user.email)
-            user.language = request.data.get('language', user.language)
-            user.save()
-            
-            return Response({
-                'message': 'Profile completed successfully',
-                'user': {
-                    'id': user.id,
-                    'phone_number': user.phone_number,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'email': user.email,
-                    'language': user.language,
-                    'civic_score': user.civic_score,
-                    'account_type': user.account_type
-                }
-            })
-        except Exception as e:
-            return Response({'error': str(e)}, status=400)
+        user = request.user
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        email = request.data.get('email')
+        language = request.data.get('language')
+        
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+        if email:
+            user.email = email
+        if language:
+            user.language = language
+        
+        user.save()
+        
+        return Response({
+            'message': 'Profile completed successfully',
+            'user': UserSerializer(user).data
+        })
 
 class MPesaAuthenticateView(APIView):
     permission_classes = [AllowAny]
@@ -147,25 +145,18 @@ class MPesaAuthenticateView(APIView):
         if not checkout_request_id:
             return Response({'error': 'CheckoutRequestID required'}, status=400)
         
-        if phone_number and phone_number.startswith('0'):
+        if not phone_number:
+            return Response({'error': 'Phone number required'}, status=400)
+        
+        if phone_number.startswith('0'):
             phone_number = '254' + phone_number[1:]
-        elif phone_number and phone_number.startswith('+'):
+        elif phone_number.startswith('+'):
             phone_number = phone_number[1:]
         
-        consumer_key = settings.MPESA_CONSUMER_KEY
-        consumer_secret = settings.MPESA_CONSUMER_SECRET
-        
-        auth_string = f"{consumer_key}:{consumer_secret}"
-        auth_bytes = auth_string.encode('ascii')
-        auth_base64 = base64.b64encode(auth_bytes).decode('ascii')
-        
-        headers = {'Authorization': f'Basic {auth_base64}'}
-        auth_url = 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-        
         try:
-            auth_response = requests.get(auth_url, headers=headers, timeout=10)
-            access_token = auth_response.json().get('access_token')
-            
+            # Query transaction status
+            from accounts.mpesa_views import MPesaAuth, QueryStatusView
+            access_token = MPesaAuth.get_access_token()
             if not access_token:
                 return Response({'success': False, 'message': 'Failed to authenticate with M-Pesa'}, status=500)
             
@@ -177,7 +168,7 @@ class MPesaAuthenticateView(APIView):
             password_bytes = password_str.encode('ascii')
             password = base64.b64encode(password_bytes).decode('ascii')
             
-            query_headers = {
+            headers = {
                 'Authorization': f'Bearer {access_token}',
                 'Content-Type': 'application/json'
             }
@@ -189,27 +180,30 @@ class MPesaAuthenticateView(APIView):
                 'CheckoutRequestID': checkout_request_id
             }
             
-            query_url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
-            query_response = requests.post(query_url, json=payload, headers=query_headers, timeout=10)
-            result = query_response.json()
+            url = 'https://sandbox.safaricom.co.ke/mpesa/stkpushquery/v1/query'
+            response = requests.post(url, json=payload, headers=headers, timeout=30)
+            result = response.json()
             
             if result.get('ResultCode') == '0':
                 user, created = User.objects.get_or_create(
                     phone_number=phone_number
                 )
+                
                 refresh = RefreshToken.for_user(user)
+                
                 return Response({
                     'success': True,
                     'access_token': str(refresh.access_token),
                     'refresh_token': str(refresh),
                     'user_id': user.id,
-                    'phone_number': phone_number,
+                    'phone_number': user.phone_number,
                     'is_new_user': created
                 })
             else:
                 return Response({
                     'success': False,
-                    'message': result.get('ResultDesc', 'Payment not completed')
+                    'message': result.get('ResultDesc', 'Payment not completed'),
+                    'result_code': result.get('ResultCode')
                 }, status=400)
                 
         except Exception as e:
@@ -217,31 +211,3 @@ class MPesaAuthenticateView(APIView):
                 'success': False,
                 'error': str(e)
             }, status=500)
-
-class CompleteProfileView(APIView):
-    permission_classes = [IsAuthenticated]
-    
-    def post(self, request):
-        try:
-            user = request.user
-            user.first_name = request.data.get('first_name', user.first_name)
-            user.last_name = request.data.get('last_name', user.last_name)
-            user.email = request.data.get('email', user.email)
-            user.language = request.data.get('language', user.language)
-            user.save()
-            
-            return Response({
-                'message': 'Profile completed successfully',
-                'user': {
-                    'id': user.id,
-                    'phone_number': user.phone_number,
-                    'first_name': user.first_name,
-                    'last_name': user.last_name,
-                    'email': user.email,
-                    'language': user.language,
-                    'civic_score': user.civic_score,
-                    'account_type': user.account_type
-                }
-            })
-        except Exception as e:
-            return Response({'error': str(e)}, status=400)
